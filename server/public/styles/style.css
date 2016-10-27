@@ -1,0 +1,28 @@
+main {
+  width: 80%;
+  margin: 0 auto;
+}
+main * {
+  text-align: center;
+}
+
+header {
+  text-align: center;
+  font-size: 300%;
+}
+
+form {
+
+}
+
+.taskList_taskTitle{
+  margin: 0;
+  margin-top: 10px;
+  padding: 0;
+}
+.taskdesc{
+  margin-top: 0;
+  margin-bottom: 0;
+  font-size: 12px;
+  padding-bottom: 20px;
+}
