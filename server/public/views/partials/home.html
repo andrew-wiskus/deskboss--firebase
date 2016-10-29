@@ -3,8 +3,20 @@
     <input type="text" ng-model="newTask.title" ng-value="newTask.title"></input>
     <button type="submit" ng-click="addTask(newTask)">+</button>
 </form>
-<div ng-repeat="task in user.taskList" >
-    <button ng-click="completeTask(task)">DONE!</button> <p>
-    {{task.is_complete}}
+<div ng-repeat="task in user.taskList | filter: is_complete == true">
+
+  <p>{{task.title}} </p>
+  <button ng-click="completeTask(task)">DONE!</button>
+  <button ng-click="deleteTask(task)">DELETE</button>
+
+</div>
+
+<button ng-click="showCompleted = !showCompleted" ><span>{{showCompleted ? 'hide' : 'show'}} </span> completed tasks</button>
+
+<div ng-if="showCompleted" ng-repeat="task in user.taskList | filter: is_complete != true">
+
+    <p>{{task.title}} </p>
+    <button ng-click="completeTask(task)">DONE!</button>
+    <button ng-click="deleteTask(task)">DELETE</button>
 
 </div>

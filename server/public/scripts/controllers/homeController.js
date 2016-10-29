@@ -5,126 +5,126 @@ myApp.controller("HomeController", ["$scope", "$http", "$timeout", "$location", 
     $scope.auth = AuthFactory;
     $scope.user;
     $scope.newTask = {
-      title: "",
-      scrum: 1,
-      in_folder: null
+        title: "",
+        scrum: 1,
+        in_folder: null
+    }
+    $scope.showCompleted = false;
+
+
+
+
+    //MARK:------FIREBASE BRAIN
+    //the super firebase listener :: ie the brain of the database all lives here. :: ie all the listeners n stuff :: ie firebase rox
+    //ps. this is always running and listening for changes, even user == null. //TODO: force login/signin popup
+
+    $scope.auth.$onAuthStateChanged(function(user) {
+
+
+        var dbRef = firebase.database()
+            .ref()
+            .child('userdb')
+            .child(user.uid)
+
+        //anytime there is a change to the user's task list -- update dom :)
+        dbRef.on('value', snap => {
+            //scope init funcs.
+            console.log('ish changed')
+            updateUserObject(user, snap.val()) //snap.val() = user tasklist;
+        })
+
+    });
+
+
+
+    //MARK:------PUT REQUEST
+    $scope.completeTask = function(task) {
+            var temp = task
+            temp.is_complete = !temp.is_complete;
+            updateListItem(temp);
+
+        }
+
+    //passes in list item after update and appends to db.
+    function updateListItem(task) {
+        var dbRef = firebase.database()
+            .ref()
+            .child('userdb')
+            .child($scope.user.uid)
+            .child(task.id)
+            .set({
+                title: task.title,
+                scrum: task.scrum,
+                in_folder: null,
+                is_complete: task.is_complete
+            });
+    }
+
+    //MARK:------DELETE REQUEST
+    $scope.deleteTask = function(task) {
+            var dbRef = firebase.database()
+                .ref()
+                .child('userdb')
+                .child($scope.user.uid)
+                .child(task.id)
+                .remove();
+
+        }
+    //MARK:------POST REQUEST
+
+    $scope.addTask = function(taskObject, user) {
+        var id = $scope.user.uid
+        var newTaskObject = new TaskObject(taskObject.title, taskObject.scrum, null)
+        var user_tasklist = firebase.database()
+            .ref()
+            .child('userdb')
+            .child(id);
+
+        user_tasklist.push(newTaskObject);
     }
 
 
 
 
+    //MARK:------DATA SORTING / INIT
 
-//MARK:------FIREBASE BRAIN
-//the super firebase listener :: ie the brain of the database all lives here. :: ie all the listeners n stuff :: ie firebase rox
-//ps. this is always running and listening for changes, even user == null. //TODO: force login/signin popup
+    //taskobject constructor for default values
+    function TaskObject(title, scrum, folder) {
+        this.title = title;
+        this.scrum = scrum;
+        this.folder = folder;
+        this.is_complete = false;
+    }
 
-        $scope.auth.$onAuthStateChanged(function(user) {
+    //uses underscore to format object and update $scope.user.taskList
+    function updateUserObject(user, data) {
 
-
-            var dbRef = firebase.database()
+        var userDB = firebase.database()
             .ref()
             .child('userdb')
-            .child(user.uid)
-
-            //anytime there is a change to the user's task list -- update dom :)
-            dbRef.on('value', snap => {
-              //scope init funcs.
-              console.log('ish changed')
-              updateUserObject(user)
-            })
-
-        });
+            .child(user.uid);
 
 
+            var tempArray = [];
+            _.pairs(data)
+                .forEach(function(dataArray) {
+                    dataArray[1].id = dataArray[0];
+                    tempArray.push(
+                        dataArray[1]
+                    )
+                })
 
-//MARK:------PUT REQUEST
-        $scope.completeTask = function(task){
-          console.log(task);
-          var temp = task
-          temp.is_complete = !temp.is_complete;
-          updateListItem(temp);
-
-        }
-        //passes in list item after update and appends to db.
-        function updateListItem(listItem){
-          var dbRef = firebase.database()
-              .ref()
-              .child('userdb')
-              .child($scope.user.uid)
-              .child(listItem.id)
-              .set({title: listItem.title, scrum: 9, in_folder: null, is_complete: false});
-        }
-//MARK:------POST REQUEST
-
-$scope.addTask = function(taskObject, user){
-  var id = $scope.user.uid
-  var newTaskObject = new TaskObject(taskObject.title, taskObject.scrum, null)
-  var user_tasklist = firebase.database()
-    .ref()
-    .child('userdb')
-    .child(id);
-
-  user_tasklist.push(newTaskObject);
-}
+            //update scope
+            $timeout(function() {
+                $scope.user = user;
+                $scope.user.taskList = tempArray;
+            }, 0);
 
 
-
-
-//MARK:------DATA SORTING / INIT
-
-//taskobject constructor for default values
-function TaskObject(title, scrum, folder){
-  this.title = title;
-  this.scrum = scrum;
-  this.folder = folder;
-  this.is_compelte = false;
-}
-
-//uses underscore to format object and update $scope.user.taskList
-function updateUserObject(user) {
-
-  var userDB = firebase.database()
-  .ref()
-  .child('userdb')
-  .child(user.uid);
-
-  userDB.once('value', function(data) {
-    var tempArray = [];
-    _.pairs(data.val())
-        .forEach(function(dataArray) {
-            dataArray[1].id = dataArray[0];
-            tempArray.push(
-                dataArray[1]
-            )
-        })
-
-    //update scope
-    $timeout(function() {
-      $scope.user = user;
-      $scope.user.taskList = tempArray;
-    }, 0);
-  })
-
-}
+    }
 
 
 }]);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
