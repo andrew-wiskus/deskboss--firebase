@@ -1,5 +1,7 @@
-# github30DayChallenge
-:wink:
-SOON TO BE A SUPER SWAG APP!
+a remake of deskboss.io using firebase
+
+#######future scope: 
+
+
 
 :)
