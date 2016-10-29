@@ -38,12 +38,18 @@ myApp.controller("HomeController", ["$scope", "$http", "$timeout", "$location", 
 
 
     //MARK:------PUT REQUEST
+    $scope.editTask = function(task){
+      var temp = task;
+      temp.edit = false;
+      updateListItem(temp);
+    }
+
     $scope.completeTask = function(task) {
             var temp = task
             temp.is_complete = !temp.is_complete;
             updateListItem(temp);
 
-        }
+    }
 
     //passes in list item after update and appends to db.
     function updateListItem(task) {
@@ -94,6 +100,7 @@ myApp.controller("HomeController", ["$scope", "$http", "$timeout", "$location", 
         this.scrum = scrum;
         this.folder = folder;
         this.is_complete = false;
+        this.edit = false;
     }
 
     //uses underscore to format object and update $scope.user.taskList

@@ -19,3 +19,12 @@ form {
   font-size: 12px;
   padding-bottom: 20px;
 }
+
+.taskListTitle{
+  max-width: 200px;
+  font-size: 12px;
+  font-family: helvetica;
+  font-weight: lighter;
+  display: inline-block;
+
+}
