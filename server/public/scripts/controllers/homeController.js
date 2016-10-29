@@ -80,19 +80,48 @@ myApp.controller("HomeController", ["$scope", "$http", "$timeout", "$location", 
 
     $scope.addTask = function(taskObject, user) {
         var id = $scope.user.uid
-        var newTaskObject = new TaskObject(taskObject.title, taskObject.scrum, null)
+        var scrumCount = findScrum(taskObject.title).scrum
+        var taskTitle = findScrum(taskObject.title).title
+
+        //todo: fix w/o using .alert
+        if (scrumCount != -1){
+        if(scrumCount.search(/[a-z]/) != -1){
+          console.log('HEY');
+          alert('Dont use hashtags in the middle of a task title, only at the end for scrum count :)')
+          return;
+        }}
+
+        var newTaskObject = new TaskObject(taskTitle, scrumCount, null)
         var user_tasklist = firebase.database()
             .ref()
             .child('userdb')
             .child(id);
 
         user_tasklist.push(newTaskObject);
+        $scope.newTask.title = "";
     }
 
 
 
 
     //MARK:------DATA SORTING / INIT
+
+    function findScrum(str){
+
+      //finds if #
+      var scrum = str.search('#');
+      var tempObj = {};
+      if(scrum != -1){
+        tempObj.scrum = str.substring(scrum + 1)
+        tempObj.title = str.substring(0, scrum);
+      } else {
+        tempObj.scrum = scrum;
+        tempObj.title = str;
+      }
+
+      return tempObj;
+
+    }
 
     //taskobject constructor for default values
     function TaskObject(title, scrum, folder) {
