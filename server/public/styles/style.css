@@ -1,5 +1,6 @@
 main{
   padding-left: 100px;
+  font-family: helvetica;
 }
 
 
@@ -20,8 +21,37 @@ form {
   padding-bottom: 20px;
 }
 
+.bugText{
+  font-size: 14px;
+  font-weight: lighter;
+  font-family: helvetica;
+  width: 400px;
+  display: inline-block;
+}
+
+.headertext{
+  margin-bottom: 0;
+  font-family: helvetica;
+}
+.commandLineText{
+  margin-top: 50px;
+  margin-bottom: 0;
+}
+.commandLine{
+  margin-top: 5px;
+
+  width: 500px;
+  height: 23px;
+  font-family: 'helvetica';
+  font-size: 15px;
+  font-weight: lighter;
+}
+
+p{
+  margin: 2px;
+}
 .taskListTitle{
-  max-width: 200px;
+  width: 300px;
   font-size: 12px;
   font-family: helvetica;
   font-weight: lighter;
