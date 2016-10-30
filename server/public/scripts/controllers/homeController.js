@@ -10,7 +10,7 @@ myApp.controller("HomeController", ["$scope", "$http", "$timeout", "$location", 
         in_folder: null
     }
     $scope.showCompleted = false;
-
+    $scope.currentFolder = 'main'
 
 
 
@@ -79,9 +79,15 @@ myApp.controller("HomeController", ["$scope", "$http", "$timeout", "$location", 
     //MARK:------POST REQUEST
 
     $scope.addTask = function(taskObject, user) {
+
+      if(blingCheck(taskObject.title)){
+        return;
+      }
+
         var id = $scope.user.uid
         var scrumCount = findScrum(taskObject.title).scrum
         var taskTitle = findScrum(taskObject.title).title
+
 
         //todo: fix w/o using .alert
         if (scrumCount != -1){
@@ -91,7 +97,7 @@ myApp.controller("HomeController", ["$scope", "$http", "$timeout", "$location", 
           return;
         }}
 
-        var newTaskObject = new TaskObject(taskTitle, scrumCount, null)
+        var newTaskObject = new TaskObject(taskTitle, scrumCount, $scope.currentFolder)
         var user_tasklist = firebase.database()
             .ref()
             .child('userdb')
@@ -105,7 +111,87 @@ myApp.controller("HomeController", ["$scope", "$http", "$timeout", "$location", 
 
 
     //MARK:------DATA SORTING / INIT
+    function findFoldersToShow(){
+      var current = $scope.currentFolder;
+      var folders = _.uniq($scope.user.folders.map(folder=>{return folder.folder}));
+      console.log(folders);
+      folders = folders.map(folder=>{
 
+        if(current.search(folder) != -1){
+          return {folder: folder, show: false};
+        }
+
+
+        if(folder == current){
+          return {folder: folder, show: false};
+        } else if (folder.substring(current.length + 1).search('/') != -1 ){
+          return {folder: folder, show: false}
+        }
+
+        var rev = folder.split('')
+        rev.reverse();
+        var revStr = ''
+        rev = rev.map(chars =>{
+          revStr += chars
+        });
+        revStr = revStr.substring(revStr.search('/')).split('').reverse();
+        rev = ''
+        revStr.map(chars =>{
+            rev += chars;
+        })
+        if(current.substring(rev.length) != ''){
+          return{folder: folder, show: false};
+        };
+
+
+        // console.log(rev.substring(0).split('').reverse().join(''));
+
+
+          return {folder: folder, show: true};
+
+      })
+      console.log(folders);
+      $scope.user.folders = folders;
+    }
+    function blingCheck(str){
+      if(str == '~'){
+        $scope.currentFolder = 'main';
+        findFoldersToShow()
+        $scope.newTask = {};
+        return true;
+      }
+      if(str[0] == '$'){
+        var tempStr = str.substring(1);
+        if(tempStr.substring(0,4) == "dir "){
+          if(tempStr.substring(4) == '..'){
+            var folders = $scope.currentFolder;
+            folders = folders.split('/');
+            var newDir = '';
+            folders.map(function(folderName, index){
+              if(index != folders.length - 1 && index != folders.length - 2){
+                newDir += (folderName + '/')
+              } else if (index != folders.length - 1){
+                newDir += (folderName);
+              } else {
+                $scope.currentFolder = newDir;
+                findFoldersToShow()
+              }
+            })
+            return true;
+
+          }
+        $scope.currentFolder += '/' + tempStr.substring(4);
+        findFoldersToShow();
+        $scope.newTask.title = '';
+        }
+
+
+
+
+        return true;
+      }
+
+    }
     function findScrum(str){
 
       //finds if #
@@ -149,11 +235,21 @@ myApp.controller("HomeController", ["$scope", "$http", "$timeout", "$location", 
                         dataArray[1]
                     )
                 })
+            var folderArray = [];
+            tempArray.forEach(function(task){
 
+
+              folderArray.push({folder: task.folder, show: false})
+            })
+
+            folderArray = _.uniq(folderArray);
             //update scope
             $timeout(function() {
                 $scope.user = user;
                 $scope.user.taskList = tempArray;
+                $scope.user.folders = folderArray;
+                findFoldersToShow();
+
             }, 0);
 
 
