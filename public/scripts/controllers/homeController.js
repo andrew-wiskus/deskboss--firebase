@@ -5,21 +5,38 @@ myApp.controller("HomeController", ["$scope", "$http", "$document", "$timeout", 
     $document.bind("keydown", function(event) {
 
         //autocomplete functionality.. LIKE TERMINAL!@#! YAY
-        if(event.key == "Tab"){
-          console.log('TAB PRESSED');
-          //autocompleteFunction($scope.newTask.title);
+        if (event.key == "Tab") {
+            console.log('TAB PRESSED');
+            //autocompleteFunction($scope.newTask.title);
+            if ($scope.newTask.title != '') {
+                if ($scope.newTask.title[0] == '$') {
+                    //auto complete for commands goes here
+                    console.log('attempting autocomplete');
+                    var commandString = $scope.newTask.title
+                    var temp = commandString + 'x';
+                    console.log(temp);
+                    if (temp.search(" ") == -1){
+                      console.log('no spaces, going through command list')
 
-          //stops from making a mess with focus
-          event.preventDefault();
+                    } else {
+                      console.log('command is entered, find command for further instruction')
+                    }
+                } else {
+                    return // allows tab functionality if not trying to autocomplete command
+                }
+            }
+            //stops from making a mess with focus
+            event.preventDefault();
         }
     });
-//     $scope.name = 'World';
-// $scope.keyCode = "";
-// $scope.keyPressed = function(e) {
-//   $scope.keyCode = e.which;
-// };
+    //     $scope.name = 'World';
+    // $scope.keyCode = "";
+    // $scope.keyPressed = function(e) {
+    //   $scope.keyCode = e.which;
+    // };
 
     //show/hide filter variables
+    $scope.showTimer = false;
     $scope.showCompleted = false;
     $scope.currentFolder = 'main'
     $scope.showBugs = false;
@@ -32,7 +49,7 @@ myApp.controller("HomeController", ["$scope", "$http", "$document", "$timeout", 
         scrum: 1,
         in_folder: null
     }
-
+    $scope.timer = {};
     //auth variables
     var userFactory = UserFactory;
     var signIn = userFactory.signIn();
@@ -342,7 +359,7 @@ myApp.controller("HomeController", ["$scope", "$http", "$document", "$timeout", 
                             deleteTask(task);
                         })
                     } else {
-                      $scope.newTask.title = '';
+                        $scope.newTask.title = '';
                         console.log('pressed no');
                     }
                 } else {
@@ -390,13 +407,26 @@ myApp.controller("HomeController", ["$scope", "$http", "$document", "$timeout", 
             //$timer end
             //NOTE: if refresh browser timers NEEDS to stay current. use Date.toString() and have a 'state' for each timer  in db;
             //NOTE: timer goes after set time, ui effect/alert after timer runs out.
+            if (commandString.substring(0, 6) == "timer") {
+                $scope.showTimer = !$scope.showTimer;
+            }
+            if (commandString.substring(0, 6) == "timer ") {
 
-            if(commandString.substring(0, 6) == "timer "){
-              var timerCommands = ['add', 'start', 'pause', 'complete', 'end'];
 
-              //assumeing its not a command above
-              //create timer
-              var timerstring = '00:00:00';
+                // $timer time 00:00:00
+                // $timer start
+                // $timer pause
+                // $timer end
+                // $timer add task
+                // $timer complete task
+
+                var timerCommands = ['add', 'start', 'pause', 'complete', 'end'];
+
+                //assumeing its not a command above
+                //create timer
+                var timerstring = '00:00:00';
+
+
             }
 
 
@@ -436,7 +466,8 @@ myApp.controller("HomeController", ["$scope", "$http", "$document", "$timeout", 
         this.folder = folder;
         this.is_complete = false;
         this.edit = false;
-        this.date = Date().toString();
+        this.date = Date()
+            .toString();
     }
 
     //uses underscore to format object and update $scope.user.taskList
@@ -459,10 +490,10 @@ myApp.controller("HomeController", ["$scope", "$http", "$document", "$timeout", 
         var folderArray = [];
         tempArray.forEach(function(task, i) {
 
-          // var folder = task.folder;
-          if (task.folder == null){
-            tempArray[i].folder = 'main';
-          }
+            // var folder = task.folder;
+            if (task.folder == null) {
+                tempArray[i].folder = 'main';
+            }
             folderArray.push({
                 folder: task.folder,
                 show: false
