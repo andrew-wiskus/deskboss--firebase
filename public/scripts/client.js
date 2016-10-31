@@ -6,19 +6,61 @@ myApp.config(['$routeProvider', '$sceDelegateProvider', function($routeProvider,
             templateUrl: '/views/partials/home.html',
             controller: 'HomeController'
         })
-        .when('/login', {
-            templateUrl: '/views/partials/login.html',
-            controller: 'LoginController'
+        .when('/admin', {
+            templateUrl: '/views/partials/admin.html',
+            controller: 'AdminController'
         })
-        // .when('/admin', {
-        //     templateUrl: '/views/partials/admin.html',
-        //     controller: 'AdminController',
-        //     resolve: {
-        //       'currentAuth': ['AuthFactory', function(AuthFactory){
-        //         return AuthFactory.$requireSignIn();
-        //       }]
-        //     }
-        // })
+        .when('/mission', {
+            templateUrl: '/views/partials/mission.html',
+            controller: 'MissionController'
+        })
+        .when('/services', {
+            templateUrl: '/views/partials/services/serviceOverview.html',
+            controller: 'ServiceOverviewController'
+        })
+        .when('/media_buyer', { //page going over the process of buying media space;
+            templateUrl: '/views/partials/services/mediaBuyers.html',
+            controller: 'MBController'
+        })
+        .when('/media_seller', { //page going over the process of putting media space up for sale
+            templateUrl: '/views/partials/services/mediaSellers.html',
+            controller: 'MSController'
+        })
+        .when('/design', { //page going over our design services
+            templateUrl: '/views/partials/services/design.html',
+            controller: 'DesignController'
+        })
+        .when('/media_buyer/buy', { //page with the functionality to purchase space
+
+        })
+        .when('/media_seller/sell', { //page with the functionality to put space up for sale
+
+        })
+        .when('/contactUs', { //page going over our design services
+            templateUrl: '/views/partials/contactUs.html',
+            controller: 'ContactUsController'
+        })
+        .when('/dashboard', { //page going over our design services
+            templateUrl: '/views/partials/dashboard.html',
+            controller: 'DashboardController'
+        })
+        .when('/meetTheTeam', {
+          templateUrl: '/views/partials/meetTheTeam.html',
+          controller: 'MeetTheTeamController'
+        })
+        .when('/news', {
+          templateUrl: '/views/partials/news.html',
+          controller: 'NewsController'
+        })
+        .when('/TOS', {
+          templateUrl: '/views/partials/TOS.html',
+          controller: 'TOSController'
+        })
+        .when('/privacy', {
+          templateUrl: '/views/partials/privacy.html',
+          controller: 'PrivacyController'
+        })
+
         .otherwise({
             redirectTo: 'home'
         });
