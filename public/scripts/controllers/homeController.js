@@ -25,6 +25,29 @@ myApp.controller("HomeController", ["$scope", "$http", "$timeout", "$location", 
 
     }
 
+    $scope.goToParentFolder = function() {
+        var current = $scope.currentFolder;
+        var str = '';
+        current = current.split('').reverse();
+        console.log(current);
+        current.map(char =>{
+          str += char;
+        });
+        str = str.substring(str.search('/'));
+        str = str.split('').reverse();
+        current = '';
+        str.map(char =>{
+          current += char;
+        })
+
+        if($scope.currentFolder != 'main'){
+        $scope.currentFolder = current.substring(0,current.length - 1);
+        findFoldersToShow();
+        }
+
+
+    }
+
     //MARK:------FIREBASE BRAIN
     //the super firebase listener :: ie the brain of the database all lives here. :: ie all the listeners n stuff :: ie firebase rox
     //ps. this is always running and listening for changes, even user == null. //TODO: force login/signin popup
@@ -52,17 +75,17 @@ myApp.controller("HomeController", ["$scope", "$http", "$timeout", "$location", 
         bugRef.on('value', snap => {
 
 
-          var tempArray = [];
-          _.pairs(snap.val())
-              .forEach(function(dataArray) {
-                  dataArray[1].id = dataArray[0];
-                  tempArray.push(
-                      dataArray[1]
-                  )
-              })
-              $timeout(function() {
+            var tempArray = [];
+            _.pairs(snap.val())
+                .forEach(function(dataArray) {
+                    dataArray[1].id = dataArray[0];
+                    tempArray.push(
+                        dataArray[1]
+                    )
+                })
+            $timeout(function() {
                 $scope.user.bugs = tempArray;
-              }, 0);
+            }, 0);
 
 
         })
@@ -70,15 +93,15 @@ myApp.controller("HomeController", ["$scope", "$http", "$timeout", "$location", 
     });
 
 
-    $scope.fixBug = function(bug){
-      var bugRef = firebase.database()
-      .ref()
-      .child('userdb')
-      .child('bugs')
-      .child(bug.id)
-      .remove();
-    }
-    //MARK:------PUT REQUEST
+    $scope.fixBug = function(bug) {
+            var bugRef = firebase.database()
+                .ref()
+                .child('userdb')
+                .child('bugs')
+                .child(bug.id)
+                .remove();
+        }
+        //MARK:------PUT REQUEST
     $scope.editTask = function(task) {
         var temp = task;
         temp.edit = false;
@@ -159,10 +182,6 @@ myApp.controller("HomeController", ["$scope", "$http", "$timeout", "$location", 
 
 
     //MARK:------DATA SORTING / INIT
-
-    $scope.goToParentFolder = function(){
-      console.log('clicked');
-    }
     function findFoldersToShow() {
         var current = $scope.currentFolder;
         var folders = _.uniq($scope.user.folders.map(folder => {
@@ -253,7 +272,11 @@ myApp.controller("HomeController", ["$scope", "$http", "$timeout", "$location", 
 
                 //$dir .. == cd ..
                 if (commandString.substring(4) == '..') {
-
+                    if($scope.currentFolder == 'main'){
+                      $scope.newTask.title = '';
+                      alert('sorry you can\'t go further up the folder tree, u at the top son')
+                      return true;
+                    }
                     //TODO: PUT INTO FUNCTION PLX SO MESSY :)
                     //IDEA: search txt files for //todo's //idea's //note's and upload into tasklist ? :) ?
                     var folders = $scope.currentFolder;
@@ -329,28 +352,28 @@ myApp.controller("HomeController", ["$scope", "$http", "$timeout", "$location", 
 
             //$bug x
             if (commandString.substring(0, 4) == "bug ") {
-                    var command = commandString.substring(4);
+                var command = commandString.substring(4);
 
-                    var bug = findScrum(command)
-                    console.log('bug', bug);
-                    var dbRef = firebase.database()
-                        .ref()
-                        .child('userdb')
-                        .child('bugs')
-                        .push(bug);
+                var bug = findScrum(command)
+                console.log('bug', bug);
+                var dbRef = firebase.database()
+                    .ref()
+                    .child('userdb')
+                    .child('bugs')
+                    .push(bug);
             }
 
             //$move 'x' y
-              //x: task prefix
-              //y: folder
+            //x: task prefix
+            //y: folder
 
             //$add x 'y' z
-              //x: note, alert, calander
-              //y: data
-              //z: taskprefix to attach info to
+            //x: note, alert, calander
+            //y: data
+            //z: taskprefix to attach info to
 
 
-                return true;
+            return true;
         }
 
     }
