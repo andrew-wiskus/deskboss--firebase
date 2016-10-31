@@ -75,7 +75,7 @@ myApp.controller("HomeController", ["$scope", "$http", "$document", "$timeout", 
     $scope.fixBug = function(bug) {
             var bugRef = firebase.database()
                 .ref()
-                .child('userdb')
+                .child('taskdb')
                 .child('bugs')
                 .child(bug.id)
                 .remove();
@@ -103,7 +103,7 @@ myApp.controller("HomeController", ["$scope", "$http", "$document", "$timeout", 
 
         var dbRef = firebase.database()
             .ref()
-            .child('userdb')
+            .child('taskdb')
             .child(user.uid)
 
         //anytime there is a change to the user's task list -- update dom :)
@@ -115,7 +115,7 @@ myApp.controller("HomeController", ["$scope", "$http", "$document", "$timeout", 
 
         var bugRef = firebase.database()
             .ref()
-            .child('userdb')
+            .child('taskdb')
             .child('bugs')
 
         bugRef.on('value', snap => {
@@ -147,7 +147,7 @@ myApp.controller("HomeController", ["$scope", "$http", "$document", "$timeout", 
     function deleteTask(task) {
         var dbRef = firebase.database()
             .ref()
-            .child('userdb')
+            .child('taskdb')
             .child($scope.user.uid)
             .child(task.id)
             .remove();
@@ -157,6 +157,7 @@ myApp.controller("HomeController", ["$scope", "$http", "$document", "$timeout", 
     $scope.addTask = function(taskObject, user) {
 
         if (commandCheck(taskObject.title)) {
+
             return;
         }
 
@@ -179,7 +180,7 @@ myApp.controller("HomeController", ["$scope", "$http", "$document", "$timeout", 
         var newTaskObject = new TaskObject(taskTitle, scrumCount, $scope.currentFolder)
         var user_tasklist = firebase.database()
             .ref()
-            .child('userdb')
+            .child('taskdb')
             .child(id);
 
         user_tasklist.push(newTaskObject);
@@ -267,10 +268,6 @@ myApp.controller("HomeController", ["$scope", "$http", "$document", "$timeout", 
         // $bug
         // $move
         // $add
-
-
-
-
         if (str[0] == '$') {
             var commandString = str.substring(1);
             //$dir x
@@ -316,7 +313,7 @@ myApp.controller("HomeController", ["$scope", "$http", "$document", "$timeout", 
             //$delete x
             if (commandString.substring(0, 7) == "delete ") {
                 var deleteString = commandString.substring(7);
-
+                $scope.newTask.title = '';
                 var user = $scope.user
                 var tasksToDelete = [];
                 //checks to see if the string was for a folder and pushes all tasks in that folder to task list;
@@ -340,10 +337,12 @@ myApp.controller("HomeController", ["$scope", "$http", "$document", "$timeout", 
 
                     if (confirm(confirmString)) {
                         console.log('pressed yes');
+                        $scope.newTask.title = '';
                         tasksToDelete.forEach(function(task) {
                             deleteTask(task);
                         })
                     } else {
+                      $scope.newTask.title = '';
                         console.log('pressed no');
                     }
                 } else {
@@ -359,12 +358,12 @@ myApp.controller("HomeController", ["$scope", "$http", "$document", "$timeout", 
             //$bug x
             if (commandString.substring(0, 4) == "bug ") {
                 var command = commandString.substring(4);
-
+                $scope.newTask.title = '';
                 var bug = findScrum(command)
                 console.log('bug', bug);
                 var dbRef = firebase.database()
                     .ref()
-                    .child('userdb')
+                    .child('taskdb')
                     .child('bugs')
                     .push(bug);
             }
@@ -377,6 +376,34 @@ myApp.controller("HomeController", ["$scope", "$http", "$document", "$timeout", 
             //x: note, alert, calander
             //y: data
             //z: taskprefix to attach info to
+
+
+
+            //$timer name xx:yy:zz
+            //$timer add task
+
+            //$timer start
+            //$timer pause
+
+            //$timer complete task
+
+            //$timer end
+            //NOTE: if refresh browser timers NEEDS to stay current. use Date.toString() and have a 'state' for each timer  in db;
+            //NOTE: timer goes after set time, ui effect/alert after timer runs out.
+
+            if(commandString.substring(0, 6) == "timer "){
+              var timerCommands = ['add', 'start', 'pause', 'complete', 'end'];
+
+              //assumeing its not a command above
+              //create timer
+              var timerstring = '00:00:00';
+            }
+
+
+
+
+
+
 
 
             return true;
@@ -417,7 +444,7 @@ myApp.controller("HomeController", ["$scope", "$http", "$document", "$timeout", 
 
         var userDB = firebase.database()
             .ref()
-            .child('userdb')
+            .child('taskdb')
             .child(user.uid);
 
 
@@ -459,7 +486,7 @@ myApp.controller("HomeController", ["$scope", "$http", "$document", "$timeout", 
     function updateListItem(task) {
         var dbRef = firebase.database()
             .ref()
-            .child('userdb')
+            .child('taskdb')
             .child($scope.user.uid)
             .child(task.id)
             .set({
