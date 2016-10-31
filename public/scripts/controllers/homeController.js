@@ -1,7 +1,30 @@
-myApp.controller("HomeController", ["$scope", "$http", "$timeout", "$location", 'AuthFactory', 'UserFactory', function($scope, $http, $timeout, $location, AuthFactory, UserFactory) {
+myApp.controller("HomeController", ["$scope", "$http", "$document", "$timeout", "$location", 'AuthFactory', 'UserFactory', function($scope, $http, $document, $timeout, $location, AuthFactory, UserFactory) {
     console.log("HomeController works");
 
+    //KEY EVENT LISTENER !!! SO COOL :D
+    $document.bind("keydown", function(event) {
+
+        //autocomplete functionality.. LIKE TERMINAL!@#! YAY
+        if(event.key == "Tab"){
+          console.log('TAB PRESSED');
+          //autocompleteFunction($scope.newTask.title);
+
+          //stops from making a mess with focus
+          event.preventDefault();
+        }
+    });
+//     $scope.name = 'World';
+// $scope.keyCode = "";
+// $scope.keyPressed = function(e) {
+//   $scope.keyCode = e.which;
+// };
+
+    //show/hide filter variables
+    $scope.showCompleted = false;
+    $scope.currentFolder = 'main'
     $scope.showBugs = false;
+
+    //info objects
     $scope.auth = AuthFactory;
     $scope.user;
     $scope.newTask = {
@@ -9,42 +32,65 @@ myApp.controller("HomeController", ["$scope", "$http", "$timeout", "$location", 
         scrum: 1,
         in_folder: null
     }
-    $scope.showCompleted = false;
-    $scope.currentFolder = 'main'
+
+    //auth variables
     var userFactory = UserFactory;
     var signIn = userFactory.signIn();
-    $scope.login = function() {
-        signIn();
-    }
+
+
+
 
     //clickfunctions
     $scope.clickedFolder = function(folder) {
-        console.log(folder);
         $scope.currentFolder = folder;
         findFoldersToShow();
 
     }
-
+    $scope.login = function() {
+        signIn();
+    }
     $scope.goToParentFolder = function() {
         var current = $scope.currentFolder;
         var str = '';
-        current = current.split('').reverse();
-        console.log(current);
-        current.map(char =>{
-          str += char;
+        current = current.split('')
+            .reverse();
+        current.map(char => {
+            str += char;
         });
         str = str.substring(str.search('/'));
-        str = str.split('').reverse();
+        str = str.split('')
+            .reverse();
         current = '';
-        str.map(char =>{
-          current += char;
+        str.map(char => {
+            current += char;
         })
 
-        if($scope.currentFolder != 'main'){
-        $scope.currentFolder = current.substring(0,current.length - 1);
-        findFoldersToShow();
+        if ($scope.currentFolder != 'main') {
+            $scope.currentFolder = current.substring(0, current.length - 1);
+            findFoldersToShow();
         }
 
+
+    }
+    $scope.fixBug = function(bug) {
+            var bugRef = firebase.database()
+                .ref()
+                .child('userdb')
+                .child('bugs')
+                .child(bug.id)
+                .remove();
+        }
+        //MARK:------PUT REQUEST
+    $scope.editTask = function(task) {
+        var temp = task;
+        temp.edit = false;
+        updateListItem(temp);
+    }
+
+    $scope.completeTask = function(task) {
+        var temp = task
+        temp.is_complete = !temp.is_complete;
+        updateListItem(temp);
 
     }
 
@@ -63,7 +109,7 @@ myApp.controller("HomeController", ["$scope", "$http", "$timeout", "$location", 
         //anytime there is a change to the user's task list -- update dom :)
         dbRef.on('value', snap => {
             //scope init funcs.
-            console.log('ish changed')
+            console.log('ish changed in db :)')
             updateUserObject(user, snap.val()) //snap.val() = user tasklist;
         })
 
@@ -91,44 +137,6 @@ myApp.controller("HomeController", ["$scope", "$http", "$timeout", "$location", 
         })
 
     });
-
-
-    $scope.fixBug = function(bug) {
-            var bugRef = firebase.database()
-                .ref()
-                .child('userdb')
-                .child('bugs')
-                .child(bug.id)
-                .remove();
-        }
-        //MARK:------PUT REQUEST
-    $scope.editTask = function(task) {
-        var temp = task;
-        temp.edit = false;
-        updateListItem(temp);
-    }
-
-    $scope.completeTask = function(task) {
-        var temp = task
-        temp.is_complete = !temp.is_complete;
-        updateListItem(temp);
-
-    }
-
-    //passes in list item after update and appends to db.
-    function updateListItem(task) {
-        var dbRef = firebase.database()
-            .ref()
-            .child('userdb')
-            .child($scope.user.uid)
-            .child(task.id)
-            .set({
-                title: task.title,
-                scrum: task.scrum,
-                in_folder: null,
-                is_complete: task.is_complete
-            });
-    }
 
     //MARK:------DELETE REQUEST
     $scope.deleteTask = function(task) {
@@ -177,8 +185,6 @@ myApp.controller("HomeController", ["$scope", "$http", "$timeout", "$location", 
         user_tasklist.push(newTaskObject);
         $scope.newTask.title = "";
     }
-
-
 
 
     //MARK:------DATA SORTING / INIT
@@ -272,10 +278,10 @@ myApp.controller("HomeController", ["$scope", "$http", "$timeout", "$location", 
 
                 //$dir .. == cd ..
                 if (commandString.substring(4) == '..') {
-                    if($scope.currentFolder == 'main'){
-                      $scope.newTask.title = '';
-                      alert('sorry you can\'t go further up the folder tree, u at the top son')
-                      return true;
+                    if ($scope.currentFolder == 'main') {
+                        $scope.newTask.title = '';
+                        alert('sorry you can\'t go further up the folder tree, u at the top son')
+                        return true;
                     }
                     //TODO: PUT INTO FUNCTION PLX SO MESSY :)
                     //IDEA: search txt files for //todo's //idea's //note's and upload into tasklist ? :) ?
@@ -378,6 +384,7 @@ myApp.controller("HomeController", ["$scope", "$http", "$timeout", "$location", 
 
     }
 
+    //finds number associated with scrum #23, throws error if alpha characters past #
     function findScrum(str) {
 
         //finds if #
@@ -402,6 +409,7 @@ myApp.controller("HomeController", ["$scope", "$http", "$timeout", "$location", 
         this.folder = folder;
         this.is_complete = false;
         this.edit = false;
+        this.date = Date().toString();
     }
 
     //uses underscore to format object and update $scope.user.taskList
@@ -422,9 +430,12 @@ myApp.controller("HomeController", ["$scope", "$http", "$timeout", "$location", 
                 )
             })
         var folderArray = [];
-        tempArray.forEach(function(task) {
+        tempArray.forEach(function(task, i) {
 
-
+          // var folder = task.folder;
+          if (task.folder == null){
+            tempArray[i].folder = 'main';
+          }
             folderArray.push({
                 folder: task.folder,
                 show: false
@@ -444,6 +455,21 @@ myApp.controller("HomeController", ["$scope", "$http", "$timeout", "$location", 
 
     }
 
+    //passes in list item after update and appends to db.
+    function updateListItem(task) {
+        var dbRef = firebase.database()
+            .ref()
+            .child('userdb')
+            .child($scope.user.uid)
+            .child(task.id)
+            .set({
+                title: task.title,
+                scrum: task.scrum,
+                folder: task.folder,
+                is_complete: task.is_complete
+            });
+    }
+
 
 }]);
 
@@ -452,7 +478,18 @@ myApp.controller("HomeController", ["$scope", "$http", "$timeout", "$location", 
 
 
 
-
+// app.directive('shortcut', function() {
+//   return {
+//     restrict: 'E',
+//     replace: true,
+//     scope: true,
+//     link:    function postLink(scope, iElement, iAttrs){
+//       jQuery(document).on('keypress', function(e){
+//          scope.$apply(scope.keyPressed(e));
+//        });
+//     }
+//   };
+// });
 
 
 //retreives value from db refrence --CALLED WHEN EVER VALUE IS CHANGED
