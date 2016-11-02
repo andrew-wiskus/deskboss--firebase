@@ -6,7 +6,6 @@ myApp.config(['$routeProvider', '$sceDelegateProvider', function($routeProvider,
             templateUrl: '/views/partials/home.html',
             controller: 'HomeController'
         })
-
         .otherwise({
             redirectTo: 'home'
         });
