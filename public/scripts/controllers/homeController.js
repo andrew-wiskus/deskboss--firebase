@@ -1,7 +1,7 @@
 myApp.controller("HomeController", ["$scope", "$http", "$document", "$timeout", "$location", 'AuthFactory', 'UserFactory', function($scope, $http, $document, $timeout, $location, AuthFactory, UserFactory) {
     console.log("HomeController works");
 
-<<<<<<< HEAD
+
     //KEY EVENT LISTENER !!! SO COOL :D
     var commands = ['$dir', '$delete', '$bug', '$timer']
     var commandCycle = 0;
@@ -227,7 +227,7 @@ myApp.controller("HomeController", ["$scope", "$http", "$document", "$timeout", 
         //stores icon
         //stores other user data
         //if no key found -> TRIGGER FIRST TIME LOG IN;
-        
+
 
 
     });
@@ -604,9 +604,7 @@ myApp.controller("HomeController", ["$scope", "$http", "$document", "$timeout", 
                 is_complete: task.is_complete
             });
     }
-=======
 
->>>>>>> c6c61b441d87cca1bd19f96c65514f53e17bc8ad
 
 
 }]);
