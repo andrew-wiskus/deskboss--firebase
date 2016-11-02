@@ -6,19 +6,7 @@ myApp.config(['$routeProvider', '$sceDelegateProvider', function($routeProvider,
             templateUrl: '/views/partials/home.html',
             controller: 'HomeController'
         })
-        .when('/login', {
-            templateUrl: '/views/partials/login.html',
-            controller: 'LoginController'
-        })
-        // .when('/admin', {
-        //     templateUrl: '/views/partials/admin.html',
-        //     controller: 'AdminController',
-        //     resolve: {
-        //       'currentAuth': ['AuthFactory', function(AuthFactory){
-        //         return AuthFactory.$requireSignIn();
-        //       }]
-        //     }
-        // })
+
         .otherwise({
             redirectTo: 'home'
         });

@@ -1,6 +1,7 @@
 myApp.controller("HomeController", ["$scope", "$http", "$document", "$timeout", "$location", 'AuthFactory', 'UserFactory', function($scope, $http, $document, $timeout, $location, AuthFactory, UserFactory) {
     console.log("HomeController works");
 
+<<<<<<< HEAD
     //KEY EVENT LISTENER !!! SO COOL :D
     var commands = ['$dir', '$delete', '$bug', '$timer']
     var commandCycle = 0;
@@ -603,45 +604,9 @@ myApp.controller("HomeController", ["$scope", "$http", "$document", "$timeout", 
                 is_complete: task.is_complete
             });
     }
+=======
+
+>>>>>>> c6c61b441d87cca1bd19f96c65514f53e17bc8ad
 
 
 }]);
-
-
-
-
-
-
-// app.directive('shortcut', function() {
-//   return {
-//     restrict: 'E',
-//     replace: true,
-//     scope: true,
-//     link:    function postLink(scope, iElement, iAttrs){
-//       jQuery(document).on('keypress', function(e){
-//          scope.$apply(scope.keyPressed(e));
-//        });
-//     }
-//   };
-// });
-
-
-//retreives value from db refrence --CALLED WHEN EVER VALUE IS CHANGED
-// dbRef.on('value', snap => console.log(snap.val()))
-
-
-
-
-//          CATCH ALL METHOD when ever anything is changed, return full object
-//          .on(('value'), snap=>{ })
-//
-//    ---------------------------------------------------
-//          child changed/added/removed.. faster?
-
-//          .on(('child_added'), snap => { })
-//          .on(('child_changed'), snap => { })
-//          .on(('child_removed'), snap => { })
-
-// hobbies.on('child_added', snap => {
-//   // console.log(snap.val());
-// })
