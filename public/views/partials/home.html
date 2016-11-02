@@ -25,7 +25,7 @@
 
 <form class="newTaskForm">
     <h3 class="commandLineText">commandline</h3>
-    <input class="commandLine" type="text" ng-model="newTask.title" ng-value="newTask.title"></input>
+    <input ng-trim = "false" class="commandLine" type="text" ng-model="newTask.title" ng-value="newTask.title"></input>
     <button type="submit" ng-click="addTask(newTask)">+</button>
 </form>
 <h4>Current Folder: {{currentFolder}}</h4>

@@ -2,27 +2,47 @@ myApp.controller("HomeController", ["$scope", "$http", "$document", "$timeout", 
     console.log("HomeController works");
 
     //KEY EVENT LISTENER !!! SO COOL :D
+    var commands = ['$dir', '$delete', '$bug', '$timer']
+    var commandCycle = 0;
     $document.bind("keydown", function(event) {
-
         //autocomplete functionality.. LIKE TERMINAL!@#! YAY
         if (event.key == "Tab") {
-            console.log('TAB PRESSED');
-            //autocompleteFunction($scope.newTask.title);
-            if ($scope.newTask.title != '') {
-                if ($scope.newTask.title[0] == '$') {
-                    //auto complete for commands goes here
-                    console.log('attempting autocomplete');
-                    var commandString = $scope.newTask.title
-                    var temp = commandString + 'x';
-                    console.log(temp);
-                    if (temp.search(" ") == -1){
-                      console.log('no spaces, going through command list')
+            var commandString = $scope.newTask.title
 
+            if (commandString != '') {
+
+
+              //cycle through commands with tab
+                if (commandString[0] == '$') {
+                    if (commandString.search(" ") == -1){
+                      $timeout(function(){
+                        $scope.newTask.title = commands[commandCycle];
+                        commandCycle++
+                        if(commandCycle == commands.length){
+                          commandCycle = 0;
+                        }
+                      },0)
                     } else {
-                      console.log('command is entered, find command for further instruction')
+                //command entered + space, go through auto complete via task list/command list
+                    switch(commandString.substring(0,commandString.search(" "))){
+                      // case '$bug':
+                      // break;
+                      case '$dir':
+                      console.log('dir-> find children directorys and cycle')
+                      break;
+                      case '$delete':
+                      console.log('cycle through all folders')
+                      break;
+                      case '$timer':
+                      console.log('cycle through timer commands')
+                      break;
+                      default:
+                      console.log('that command has no autocomplete feature');
+                    }
+
                     }
                 } else {
-                    return // allows tab functionality if not trying to autocomplete command
+                    // return // allows tab functionality if not trying to autocomplete command
                 }
             }
             //stops from making a mess with focus
@@ -152,6 +172,62 @@ myApp.controller("HomeController", ["$scope", "$http", "$document", "$timeout", 
 
 
         })
+
+        //TODO: POJO ! :D
+        var pojoRef = firebase.database()
+        .ref()
+        .child('pojodb')
+        .child(user.uid)
+
+        // console.log(user.uid);
+        //create pojo;
+        // pojoRef.push({members: ['UJtVOdWpjxfDsfwdu5UkxIH0bzr2', 'OsPlovxTvMeCsow8dIO26EvcrqI3'], taskList: [{title: 'testing1', scrum: 'testing2'}, {title: 'testing3', scrum: 'testing4'}]})
+        //TODO: make new ref for member
+        //TODO: push same info
+
+        // pojoRef.on('value', snap => {
+        //
+        //
+        //     var tempArray = [];
+        //     _.pairs(snap.val())
+        //         .forEach(function(dataArray) {
+        //             dataArray[1].id = dataArray[0];
+        //             tempArray.push(
+        //                 dataArray[1]
+        //             )
+        //         })
+        //     $timeout(function() {
+        //         $scope.user.pojo = tempArray;
+        //         console.log($scope.user.pojo);
+        //     }, 0);
+        //
+        //
+        // })
+
+
+        //view friends {requests: [], friends:[{id: x, email: y, emojiStatus: z}]}
+        var freindRef = firebase.database()
+        .ref()
+        .child('frienddb')
+
+
+        // user request friend?- >
+        // friendRef.child(pendingFriend.uid).child('requests').push({id: user.uid, email: user.email})
+
+        //user accept friend request? ->
+        // friendRef.child(user.uid).child('friends').push({id: newFriend.uid, email: newFriend.email}) //other friend to friend info
+
+        var userdbRef = firebase.database()
+        .ref()
+        .child('userdb')
+
+        //stores pref email
+        //stores display name
+        //stores icon
+        //stores other user data
+        //if no key found -> TRIGGER FIRST TIME LOG IN;
+        
+
 
     });
 
