@@ -8,9 +8,10 @@
 
 <!-- <shortcut></shortcut> -->
 
+
 <button ng-click="showBugs = !showBugs"> BUGGS </button>
 <div ng-show="showBugs" ng-repeat="bug in user.bugs">
-  <p class="bugText">priority: {{bug.scrum}} // {{bug.title}}</p>
+  <p class="bugText"><button ng-click="scrumUp(bug)">+</button><button ng-click="scrumDown(bug)">-</button>priority: {{bug.scrum}} // {{bug.title}}</p>
   <button ng-click="fixBug(bug)">FIXED!</button>
 </div>
 </br>
@@ -30,7 +31,7 @@
 </form>
 <h4>Current Folder: {{currentFolder}}</h4>
 <div ng-show="!task.is_complete && task.folder == currentFolder" ng-repeat="task in user.taskList">
-  <p class="taskListTitle" ng-if="task.edit != true">{{task.title}}</p>
+  <p class="taskListTitle" ng-if="task.edit != true"><button ng-click="scrumUp(task)">+</button><button ng-click="scrumDown(task)">-</button>scrum:{{task.scrum}}:{{task.title}}</p>
 <form ng-if="task.edit == true">
   <input type="text" ng-model="task.title" value="task.title"></input>
   <button type="submit" ng-click="editTask(task)">SAVE</button> <button ng-click="task.edit = !task.edit">CANCEL</button>
@@ -41,7 +42,7 @@
 </div>
 <button ng-click="goToParentFolder()">BACK</button>
 ---folders-----
-<div ng-click="clickedFolder(folder.folder)" ng-if = 'folder.show'ng-repeat="folder in user.folders">
+<div ng-click="clickedFolder(folder.folder)" ng-if ='folder.show' ng-repeat="folder in user.folders">
   {{folder.folder}}
 </div>
 </div>

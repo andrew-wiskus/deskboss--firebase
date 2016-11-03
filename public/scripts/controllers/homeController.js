@@ -13,33 +13,33 @@ myApp.controller("HomeController", ["$scope", "$http", "$document", "$timeout", 
             if (commandString != '') {
 
 
-              //cycle through commands with tab
+                //cycle through commands with tab
                 if (commandString[0] == '$') {
-                    if (commandString.search(" ") == -1){
-                      $timeout(function(){
-                        $scope.newTask.title = commands[commandCycle];
-                        commandCycle++
-                        if(commandCycle == commands.length){
-                          commandCycle = 0;
-                        }
-                      },0)
+                    if (commandString.search(" ") == -1) {
+                        $timeout(function() {
+                            $scope.newTask.title = commands[commandCycle];
+                            commandCycle++
+                            if (commandCycle == commands.length) {
+                                commandCycle = 0;
+                            }
+                        }, 0)
                     } else {
-                //command entered + space, go through auto complete via task list/command list
-                    switch(commandString.substring(0,commandString.search(" "))){
-                      // case '$bug':
-                      // break;
-                      case '$dir':
-                      console.log('dir-> find children directorys and cycle')
-                      break;
-                      case '$delete':
-                      console.log('cycle through all folders')
-                      break;
-                      case '$timer':
-                      console.log('cycle through timer commands')
-                      break;
-                      default:
-                      console.log('that command has no autocomplete feature');
-                    }
+                        //command entered + space, go through auto complete via task list/command list
+                        switch (commandString.substring(0, commandString.search(" "))) {
+                            // case '$bug':
+                            // break;
+                            case '$dir':
+                                console.log('dir-> find children directorys and cycle')
+                                break;
+                            case '$delete':
+                                console.log('cycle through all folders')
+                                break;
+                            case '$timer':
+                                console.log('cycle through timer commands')
+                                break;
+                            default:
+                                console.log('that command has no autocomplete feature');
+                        }
 
                     }
                 } else {
@@ -75,6 +75,12 @@ myApp.controller("HomeController", ["$scope", "$http", "$document", "$timeout", 
     var userFactory = UserFactory;
     var signIn = userFactory.signIn();
 
+
+    // var newdbref = firebase.database()
+    // .ref()
+    // .child('frienddb')
+    // .child(user.uid)
+    // .child('friendlist')
 
 
 
@@ -115,121 +121,175 @@ myApp.controller("HomeController", ["$scope", "$http", "$document", "$timeout", 
                 .ref()
                 .child('taskdb')
                 .child('bugs')
-                .child(bug.id)
+                .child(bug.key)
                 .remove();
         }
         //MARK:------PUT REQUEST
     $scope.editTask = function(task) {
-        var temp = task;
-        temp.edit = false;
-        updateListItem(temp);
+        updateListItem(task);
     }
-
     $scope.completeTask = function(task) {
         var temp = task
         temp.is_complete = !temp.is_complete;
         updateListItem(temp);
 
     }
+    $scope.scrumUp = function(task) {
+
+        if (task.folder == null) { //this is a bug entry
+            var tempObj = task;
+            tempObj.scrum = (tempObj.scrum * 1) + 1;
+            console.log(tempObj);
+            var taskref = firebase.database()
+                .ref()
+                .child('taskdb')
+                .child('bugs')
+                .child(task.key)
+                .child('scrum')
+                .set(tempObj.scrum)
+
+        } else { //this is a task entry
+            var tempObj = task;
+            tempObj.scrum = (tempObj.scrum * 1) + 1;
+            console.log('attemping to increase scrum:', tempObj);
+            var taskref = firebase.database()
+                .ref()
+                .child('taskdb')
+                .child($scope.user.uid)
+                .child(task.key)
+                .child('scrum')
+                .set(tempObj.scrum)
+
+        }
+
+    }
+    $scope.scrumDown = function(task) {
+            if (task.folder == null) { //this is a bug entry
+                var tempObj = task;
+                tempObj.scrum = (tempObj.scrum * 1) - 1;
+                if (tempObj.scrum == -2) {
+                    tempObj.scrum = -1;
+                }
+                console.log(tempObj);
+                var taskref = firebase.database()
+                    .ref()
+                    .child('taskdb')
+                    .child('bugs')
+                    .child(task.key)
+                    .child('scrum')
+                    .set(tempObj.scrum);
+            } else { //this is a task entry
+                var tempObj = task;
+                tempObj.scrum = (tempObj.scrum * 1) - 1;
+                if (tempObj.scrum == -2) {
+                    tempObj.scrum = -1;
+                }
+                console.log('attemping to increase scrum:', tempObj);
+                var taskref = firebase.database()
+                    .ref()
+                    .child('taskdb')
+                    .child($scope.user.uid)
+                    .child(task.key)
+                    .child('scrum')
+                    .set(tempObj.scrum);
+            }
+        }
+
+
+
+
 
     //MARK:------FIREBASE BRAIN
     //the super firebase listener :: ie the brain of the database all lives here. :: ie all the listeners n stuff :: ie firebase rox
-    //ps. this is always running and listening for changes, even user == null. //TODO: force login/signin popup
+    //ps. this is always running and listening for changes, even user == null.
 
     $scope.auth.$onAuthStateChanged(function(user) {
 
+        if (user != null) {
 
-        var dbRef = firebase.database()
-            .ref()
-            .child('taskdb')
-            .child(user.uid)
-
-        //anytime there is a change to the user's task list -- update dom :)
-        dbRef.on('value', snap => {
-            //scope init funcs.
-            console.log('ish changed in db :)')
-            updateUserObject(user, snap.val()) //snap.val() = user tasklist;
-        })
-
-        var bugRef = firebase.database()
-            .ref()
-            .child('taskdb')
-            .child('bugs')
-
-        bugRef.on('value', snap => {
+            //LISTENER: USER TASK LIST
+            var taskRef = firebase.database()
+                .ref()
+                .child('taskdb')
+                .child(user.uid)
+            taskRef.on('value', snap => {
+                //scope init funcs.
+                console.log('ish changed in db :)')
+                updateUserObject(user, snap.val()) //snap.val() = user tasklist;
+            })
 
 
-            var tempArray = [];
-            _.pairs(snap.val())
-                .forEach(function(dataArray) {
-                    dataArray[1].id = dataArray[0];
-                    tempArray.push(
-                        dataArray[1]
-                    )
+            //LISTENER: GLOBAL BUG_INFO LIST
+            var bugRef = firebase.database()
+                .ref()
+                .child('taskdb')
+                .child('bugs')
+            bugRef.on('value', snap => {
+                var tempArray = makeSnapshotObject(snap.val())
+                $timeout(function() {
+                    $scope.user.bugs = tempArray;
+                }, 0);
+            })
+
+
+            //LISTENER: SHARED POJO LISTS
+            var pojoRef = firebase.database()
+                .ref()
+                .child('pojodb')
+                .child(user.uid)
+            pojoRef.on('value', x => {
+                var tempArray = makeSnapshotObject(x.val())
+
+                $timeout(function() {
+                    $scope.user.friends = tempArray;
                 })
-            $timeout(function() {
-                $scope.user.bugs = tempArray;
-            }, 0);
+            })
 
 
-        })
+            //LISTENER: FRIENDS LIST/REQUESTS
+            var friendRef = firebase.database()
+                .ref()
+                .child('frienddb')
+                .child(user.uid)
+            friendRef.on('value', x => {
+                var tempArray = makeSnapshotObject(x.val())
 
-        //TODO: POJO ! :D
-        var pojoRef = firebase.database()
-        .ref()
-        .child('pojodb')
-        .child(user.uid)
-
-        // console.log(user.uid);
-        //create pojo;
-        // pojoRef.push({members: ['UJtVOdWpjxfDsfwdu5UkxIH0bzr2', 'OsPlovxTvMeCsow8dIO26EvcrqI3'], taskList: [{title: 'testing1', scrum: 'testing2'}, {title: 'testing3', scrum: 'testing4'}]})
-        //TODO: make new ref for member
-        //TODO: push same info
-
-        // pojoRef.on('value', snap => {
-        //
-        //
-        //     var tempArray = [];
-        //     _.pairs(snap.val())
-        //         .forEach(function(dataArray) {
-        //             dataArray[1].id = dataArray[0];
-        //             tempArray.push(
-        //                 dataArray[1]
-        //             )
-        //         })
-        //     $timeout(function() {
-        //         $scope.user.pojo = tempArray;
-        //         console.log($scope.user.pojo);
-        //     }, 0);
-        //
-        //
-        // })
+                $timeout(function() {
+                    $scope.user.friends = tempArray;
+                })
+            })
 
 
-        //view friends {requests: [], friends:[{id: x, email: y, emojiStatus: z}]}
-        var freindRef = firebase.database()
-        .ref()
-        .child('frienddb')
+            //LISTENER: GLOBAL USERDB W/ PUBLIC INFO
+            var userdbRef = firebase.database()
+                .ref()
+                .child('userdb')
+            //TODO: function checkNewUser() {} ->search global dbRef for current user.
+            //IF NEW {
+            //prompt popup form for basic user info
+            // }
 
 
-        // user request friend?- >
-        // friendRef.child(pendingFriend.uid).child('requests').push({id: user.uid, email: user.email})
+            //LISTENER: USER SETTINGS
+            var currentUserRef = firebase.database()
+                .ref()
+                .child('userdb')
+                .child(user.uid)
+            currentUserRef.on('value', x=>{
+              var tempArray = makeSnapshotObject(x.val())
+              //IF USER SETTINGS CHANGE:
+              //update $scope.user.settings
+            })
 
-        //user accept friend request? ->
-        // friendRef.child(user.uid).child('friends').push({id: newFriend.uid, email: newFriend.email}) //other friend to friend info
-
-        var userdbRef = firebase.database()
-        .ref()
-        .child('userdb')
-
-        //stores pref email
-        //stores display name
-        //stores icon
-        //stores other user data
-        //if no key found -> TRIGGER FIRST TIME LOG IN;
+            //LISTNER: TIMER -need for offline->online capablities
+            //uses time started + time paused refrences to calcualte time remaining while comparing current time:
+            //is_paused: time | null;
+            //amount paused: int | null;
+            //started_at: time;
+            
 
 
-
+        }
     });
 
     //MARK:------DELETE REQUEST
@@ -237,17 +297,17 @@ myApp.controller("HomeController", ["$scope", "$http", "$document", "$timeout", 
         deleteTask(task);
 
     }
-
     function deleteTask(task) {
         var dbRef = firebase.database()
             .ref()
             .child('taskdb')
             .child($scope.user.uid)
-            .child(task.id)
+            .child(task.key)
             .remove();
     }
-    //MARK:------POST REQUEST
 
+
+    //MARK:------POST REQUEST
     $scope.addTask = function(taskObject, user) {
 
         if (commandCheck(taskObject.title)) {
@@ -269,6 +329,8 @@ myApp.controller("HomeController", ["$scope", "$http", "$document", "$timeout", 
                 alert('Dont use hashtags in the middle of a task title, only at the end for scrum count :)')
                 return;
             }
+        } else {
+            scrumCount = 0;
         }
 
         var newTaskObject = new TaskObject(taskTitle, scrumCount, $scope.currentFolder)
@@ -280,6 +342,8 @@ myApp.controller("HomeController", ["$scope", "$http", "$document", "$timeout", 
         user_tasklist.push(newTaskObject);
         $scope.newTask.title = "";
     }
+
+
 
 
     //MARK:------DATA SORTING / INIT
@@ -471,37 +535,65 @@ myApp.controller("HomeController", ["$scope", "$http", "$document", "$timeout", 
             //y: data
             //z: taskprefix to attach info to
 
-
-
-            //$timer name xx:yy:zz
-            //$timer add task
-
-            //$timer start
-            //$timer pause
-
-            //$timer complete task
-
-            //$timer end
+            if (commandString.substring(0, 7) == "friend ") {
+                //TODO:if friend doesnt exist in db -> check requested friends db so no multiples -> then execute code below
+                if (commandString.substring(7, 10) == "add") {
+                  var friendToAdd = commandString.substring(11);
+                  console.log(friendToAdd);
+                }
+            }
             //NOTE: if refresh browser timers NEEDS to stay current. use Date.toString() and have a 'state' for each timer  in db;
+            //NOTE: use new Date(task.date).getTime() to compare seconds between tasks ?
             //NOTE: timer goes after set time, ui effect/alert after timer runs out.
-            if (commandString.substring(0, 6) == "timer") {
+            if (commandString.substring(0, 6) == "sprint") {
                 $scope.showTimer = !$scope.showTimer;
             }
-            if (commandString.substring(0, 6) == "timer ") {
+            if (commandString.substring(0, 6) == "sprint ") {
 
+                var sprintCommands = [{
+                    command: 'add',
+                    run: function() {
+                        console.log('ADDING TASK TO SPRINT: x')
+                    }
+                }, {
+                    command: 'remove',
+                    run: function() {
+                        console.log('REMOVING TASK FROM SPRINT: x')
+                    }
+                }, {
+                    command: 'complete',
+                    run: function() {
+                        console.log('COMPLETED TASK IN SPRINT: x')
+                    }
+                }, {
+                    command: 'start',
+                    run: function() {
+                        console.log('STARTING SPRINT')
+                    }
+                }, {
+                    command: 'set',
+                    run: function() {
+                        console.log('SETTING SPRINT TIMER: x')
+                    }
+                }, {
+                    command: 'pause',
+                    run: function() {
+                        console.log('PAUSE SPRINT @: x')
+                    }
+                }, {
+                    command: 'end',
+                    run: function() {
+                        console.log('SPRINT COMPLETE, CALCULATING RESULTS')
+                    }
+                }, ];
+                var commandIndex = -1;
 
-                // $timer time 00:00:00
-                // $timer start
-                // $timer pause
-                // $timer end
-                // $timer add task
-                // $timer complete task
+                sprintCommands.map((x, y) => {
+                    if (commandString.substring(6) == x.command) {
+                        x.run();
+                    }
+                });
 
-                var timerCommands = ['add', 'start', 'pause', 'complete', 'end'];
-
-                //assumeing its not a command above
-                //create timer
-                var timerstring = '00:00:00';
 
 
             }
@@ -542,11 +634,22 @@ myApp.controller("HomeController", ["$scope", "$http", "$document", "$timeout", 
         this.scrum = scrum;
         this.folder = folder;
         this.is_complete = false;
-        this.edit = false;
         this.date = Date()
             .toString();
     }
 
+    function makeSnapshotObject(data) {
+        var tempArray = [];
+        _.pairs(data)
+            .forEach(function(dataArray) {
+                dataArray[1].key = dataArray[0];
+                tempArray.push(
+                    dataArray[1]
+                )
+            })
+
+        return tempArray;
+    }
     //uses underscore to format object and update $scope.user.taskList
     function updateUserObject(user, data) {
 
@@ -555,15 +658,8 @@ myApp.controller("HomeController", ["$scope", "$http", "$document", "$timeout", 
             .child('taskdb')
             .child(user.uid);
 
+        var tempArray = makeSnapshotObject(data);
 
-        var tempArray = [];
-        _.pairs(data)
-            .forEach(function(dataArray) {
-                dataArray[1].id = dataArray[0];
-                tempArray.push(
-                    dataArray[1]
-                )
-            })
         var folderArray = [];
         tempArray.forEach(function(task, i) {
 
@@ -592,14 +688,17 @@ myApp.controller("HomeController", ["$scope", "$http", "$document", "$timeout", 
 
     //passes in list item after update and appends to db.
     function updateListItem(task) {
+
+
         var dbRef = firebase.database()
             .ref()
             .child('taskdb')
             .child($scope.user.uid)
-            .child(task.id)
+            .child(task.key)
             .set({
+                date: task.date,
                 title: task.title,
-                scrum: task.scrum,
+                scrum: tempObj.scrum,
                 folder: task.folder,
                 is_complete: task.is_complete
             });

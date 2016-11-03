@@ -1,9 +1,9 @@
 // Initialize Firebase
 var config = {
-  apiKey: "AIzaSyBgbEnes6A99-E7t3qmpSDassX7zaR1k20",
-  authDomain: "adpromptu.firebaseapp.com",
-  databaseURL: "https://adpromptu.firebaseio.com",
-  storageBucket: "adpromptu.appspot.com",
-  messagingSenderId: "13611332351"
+  apiKey: "AIzaSyAiarxbEV9Q-4T0eF7LKYnZM5TqlUrjJhU",
+  authDomain: "deskboss-beb70.firebaseapp.com",
+  databaseURL: "https://deskboss-beb70.firebaseio.com",
+  storageBucket: "deskboss-beb70.appspot.com",
+  messagingSenderId: "775437238868"
 };
 firebase.initializeApp(config);
