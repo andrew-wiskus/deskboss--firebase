@@ -101,6 +101,8 @@ myApp.controller("HomeController", ["$scope", "$http", "$document", "$timeout", 
           if(f.uid == friend.uid){
             friendDB.child(f.key).child('is_friend').set(true)
           }
+
+
         })
       });
 
@@ -290,15 +292,24 @@ myApp.controller("HomeController", ["$scope", "$http", "$document", "$timeout", 
             var pojoRef = firebase.database()
                 .ref()
                 .child('pojodb')
-                .child(user.uid)
-            pojoRef.on('value', x => {
-                var tempArray = makeSnapshotObject(x.val())
 
-                $timeout(function() {
-                    $scope.user.pojos = tempArray;
+            // pojoRef.push({members:['wskcontact@gmail.com', 'andrewwiskus@gmail.com'], taskList: [{scrum:2,title:'make this work'}, {scrum:5, title:'fix this ish'}], title: 'myfirstpojo'});
+            //badbadbadbadbad TODO: OPTIMIZE THIS //WILL CAUSE PROBLEMS IN FUTURE IF YOU DONT!!
+            pojoRef.on('value', data=>{
+              var userPojos = [];
+              var pojos = makeSnapshotObject(data.val()) // yes.. we're listening for all of them atm and pulling all in.. wtf
+              pojos.forEach(pojo=>{
+                var isMember = _.indexOf(pojo.members, user.email);
+                if(isMember != -1){
+                  userPojos.push(pojo);
+                }
+              })
 
-                })
-            })
+              $timeout(function(){
+                $scope.user.pojos = userPojos;
+              },0)
+
+            });
 
 
             //LISTENER: FRIENDS LIST/REQUESTS

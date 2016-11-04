@@ -3,7 +3,7 @@ myApp.config(['$routeProvider', '$sceDelegateProvider', function($routeProvider,
 
     $routeProvider
         .when('/home', {
-            templateUrl: '/views/partials/home.html',
+            templateUrl: '/views/home.html',
             controller: 'HomeController'
         })
         .otherwise({

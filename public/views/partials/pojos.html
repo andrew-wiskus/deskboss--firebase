@@ -1,0 +1,12 @@
+<h4>pojos</h4>
+<div ng-repeat="pojo in user.pojos">
+
+    {{pojo.title}}
+    <h6>with: <span ng-repeat="member in pojo.members">{{member + " "}}</span></h6>
+    <button ng-click="pojo.isShowing = !pojo.isShowing">showTasks</button>
+    <div ng-if="pojo.isShowing == true">
+        <div ng-repeat="task in pojo.taskList">
+            {{task}}
+        </div>
+    </div>
+</div>

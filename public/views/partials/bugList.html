@@ -1,0 +1,5 @@
+<h4>BUGS</h4>
+<div ng-repeat="bug in user.bugs">
+    <p class="taskListTitle"><button ng-click="scrumUp(bug)">+</button><button ng-click="scrumDown(bug)">-</button>priority: {{bug.scrum}} // {{bug.title}}</p>
+    <button ng-click="fixBug(bug)">FIXED!</button>
+</div>

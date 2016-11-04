@@ -1,0 +1,61 @@
+<div ng-if="user != null">
+
+    <button ng-click="showCommands = !showCommands" class="headertext">command list</button>
+    <button ng-click="showFriends = !showFriends">friends{{user.friendRequests.length != 0 ? '( ' + user.friendRequests.length + ' friend request' + (user.friendRequests.length > 1 ? 's ' : ' ') + ')' : ''}}</button>
+    <button ng-click="showBugs = !showBugs"> bugs </button>
+    <button ng-click="devAnnouncements= !devAnnouncements">dev blog</button>
+    <button ng-click="showPojos = !showPojos"> pojos </button>
+    <div ng-if="devAnnouncements">
+        <h4>dev blog</h4>
+        <p>Blog Posts for le global db</p>
+    </div>
+    <div ng-if="showPojos">
+        <ng-include src="'views/partials/pojos.html'"></ng-include>
+    </div>
+    <div ng-if="showCommands">
+        <ng-include src="'views/partials/commandList.html'"></ng-include>
+    </div>
+    <div ng-show="showFriends">
+        <ng-include src="'views/partials/friendsList.html'"></ng-include>
+    </div>
+    <div ng-show="showBugs">
+        <ng-include src="'views/partials/bugList.html'"></ng-include>
+    </div>
+
+    <div ng-show="showTimer">
+      <ng-include src="'views/partials/timer.html'"></ng-include>
+    </div>
+
+    <form class="commandLine">
+      <ng-include src="'views/partials/commandLine.html'"></ng-include>
+    </form>
+
+    <div>
+        <ng-include src="'views/partials/taskDisplay.html'"></ng-include>
+    </div>
+
+
+    <div class="newUser_popup" ng-if="newUser == true">
+      <ng-include src="'views/partials/newUser_popup.html'"></ng-include>
+   </div>
+
+
+</div>
+
+<div ng-if="user == null">
+  <ng-include src="'views/partials/noUserLoggedIn.html'"></ng-include>
+</div>
+
+
+
+    <!-- MARK: div shows tasks that are completed -->
+    <!-- <div ng-show="task.is_complete" ng-repeat="task in user.taskList">
+  <p class="taskListTitle" ng-if="task.edit != true">{{task.is_complete}}:{{task.title}}</p>
+<form ng-if="task.edit == true">
+  <input type="text" ng-model="task.title" value="task.title"></input>
+  <button type="submit" ng-click="editTask(task)">SAVE</button> <button ng-click="task.edit = !task.edit">CANCEL</button>
+</form>
+  <button ng-click="completeTask(task)">DONE!</button>
+  <button ng-click="deleteTask(task)">DELETE</button>
+  <button ng-if="task.edit != true" ng-click="task.edit = !task.edit">EDIT</button>
+</div> -->

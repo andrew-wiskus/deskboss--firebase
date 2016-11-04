@@ -1,0 +1,8 @@
+<h4 ng-if="user.friendRequests.length > 0">REQUESTS</h4>
+<div ng-if="user.friendRequests.length > 0" ng-repeat="request in user.friendRequests">
+    {{request.email}} <button ng-click="addFriend(request)">add friend</button><button ng-click="denyFriend(request)">deny</button>
+</div>
+<h4 ng-if="user.friends.length > 0">FRIENDS</h4>
+<div ng-if="user.friends.length > 0" ng-repeat="friend in user.friends">
+    {{friend.email}}
+</div>
