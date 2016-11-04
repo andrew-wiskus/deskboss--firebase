@@ -61,7 +61,11 @@ myApp.controller("HomeController", ["$scope", "$http", "$document", "$timeout", 
     $scope.showCompleted = false;
     $scope.currentFolder = 'main'
     $scope.showBugs = false;
-
+    $scope.showCommands = false;
+    $scope.showFriends = false;
+    $scope.showPojo = false;
+    $scope.newUser = true;
+    $scope.newUserName = ''
     //info objects
     $scope.auth = AuthFactory;
     $scope.user;
@@ -85,6 +89,38 @@ myApp.controller("HomeController", ["$scope", "$http", "$document", "$timeout", 
 
 
     //clickfunctions
+    $scope.addFriend = function(friend){
+      var friendDB = firebase.database()
+      .ref()
+      .child('frienddb')
+      .child($scope.user.uid)
+
+      friendDB.once('value', data=>{
+        var friends = makeSnapshotObject(data.val());
+        friends.forEach(f=>{
+          if(f.uid == friend.uid){
+            friendDB.child(f.key).child('is_friend').set(true)
+          }
+        })
+      });
+
+    }
+    $scope.denyFriend = function(friend){
+      var friendDB = firebase.database()
+      .ref()
+      .child('frienddb')
+      .child($scope.user.uid)
+
+      friendDB.once('value', data=>{
+        var friends = makeSnapshotObject(data.val());
+        friends.forEach(f=>{
+          if(f.uid == friend.uid){
+            friendDB.child(f.key).remove();
+
+          }
+        })
+      })
+    }
     $scope.clickedFolder = function(folder) {
         $scope.currentFolder = folder;
         findFoldersToShow();
@@ -164,37 +200,54 @@ myApp.controller("HomeController", ["$scope", "$http", "$document", "$timeout", 
 
     }
     $scope.scrumDown = function(task) {
-            if (task.folder == null) { //this is a bug entry
-                var tempObj = task;
-                tempObj.scrum = (tempObj.scrum * 1) - 1;
-                if (tempObj.scrum == -2) {
-                    tempObj.scrum = -1;
-                }
-                console.log(tempObj);
-                var taskref = firebase.database()
-                    .ref()
-                    .child('taskdb')
-                    .child('bugs')
-                    .child(task.key)
-                    .child('scrum')
-                    .set(tempObj.scrum);
-            } else { //this is a task entry
-                var tempObj = task;
-                tempObj.scrum = (tempObj.scrum * 1) - 1;
-                if (tempObj.scrum == -2) {
-                    tempObj.scrum = -1;
-                }
-                console.log('attemping to increase scrum:', tempObj);
-                var taskref = firebase.database()
-                    .ref()
-                    .child('taskdb')
-                    .child($scope.user.uid)
-                    .child(task.key)
-                    .child('scrum')
-                    .set(tempObj.scrum);
+        if (task.folder == null) { //this is a bug entry
+            var tempObj = task;
+            tempObj.scrum = (tempObj.scrum * 1) - 1;
+            if (tempObj.scrum == -2) {
+                tempObj.scrum = -1;
             }
+            console.log(tempObj);
+            var taskref = firebase.database()
+                .ref()
+                .child('taskdb')
+                .child('bugs')
+                .child(task.key)
+                .child('scrum')
+                .set(tempObj.scrum);
+        } else { //this is a task entry
+            var tempObj = task;
+            tempObj.scrum = (tempObj.scrum * 1) - 1;
+            if (tempObj.scrum == -2) {
+                tempObj.scrum = -1;
+            }
+            console.log('attemping to increase scrum:', tempObj);
+            var taskref = firebase.database()
+                .ref()
+                .child('taskdb')
+                .child($scope.user.uid)
+                .child(task.key)
+                .child('scrum')
+                .set(tempObj.scrum);
         }
+    }
+    $scope.addNewUser = function(newUser, user) {
+      // console.log(user, newUser)
+        var dbRef = firebase.database()
+        .ref()
+        .child('userdb');
 
+        dbRef.push({
+                name: newUser,
+                email: user.email,
+                uid: user.uid,
+                profile_picture: null
+            }) // other public info?
+
+        $timeout(function(){
+          $scope.newUser = false;
+        },0)
+
+    }
 
 
 
@@ -206,6 +259,7 @@ myApp.controller("HomeController", ["$scope", "$http", "$document", "$timeout", 
     $scope.auth.$onAuthStateChanged(function(user) {
 
         if (user != null) {
+
 
             //LISTENER: USER TASK LIST
             var taskRef = firebase.database()
@@ -241,7 +295,8 @@ myApp.controller("HomeController", ["$scope", "$http", "$document", "$timeout", 
                 var tempArray = makeSnapshotObject(x.val())
 
                 $timeout(function() {
-                    $scope.user.friends = tempArray;
+                    $scope.user.pojos = tempArray;
+
                 })
             })
 
@@ -256,18 +311,18 @@ myApp.controller("HomeController", ["$scope", "$http", "$document", "$timeout", 
 
                 $timeout(function() {
                     $scope.user.friends = tempArray;
+                    findFriendRequests()
                 })
             })
+
 
 
             //LISTENER: GLOBAL USERDB W/ PUBLIC INFO
             var userdbRef = firebase.database()
                 .ref()
                 .child('userdb')
-            //TODO: function checkNewUser() {} ->search global dbRef for current user.
-            //IF NEW {
-            //prompt popup form for basic user info
-            // }
+            checkNewUser(userdbRef, user)
+
 
 
             //LISTENER: USER SETTINGS
@@ -275,10 +330,10 @@ myApp.controller("HomeController", ["$scope", "$http", "$document", "$timeout", 
                 .ref()
                 .child('userdb')
                 .child(user.uid)
-            currentUserRef.on('value', x=>{
-              var tempArray = makeSnapshotObject(x.val())
-              //IF USER SETTINGS CHANGE:
-              //update $scope.user.settings
+            currentUserRef.on('value', x => {
+                var tempArray = makeSnapshotObject(x.val())
+                    //IF USER SETTINGS CHANGE:
+                    //update $scope.user.settings
             })
 
             //LISTNER: TIMER -need for offline->online capablities
@@ -286,7 +341,7 @@ myApp.controller("HomeController", ["$scope", "$http", "$document", "$timeout", 
             //is_paused: time | null;
             //amount paused: int | null;
             //started_at: time;
-            
+
 
 
         }
@@ -297,6 +352,7 @@ myApp.controller("HomeController", ["$scope", "$http", "$document", "$timeout", 
         deleteTask(task);
 
     }
+
     function deleteTask(task) {
         var dbRef = firebase.database()
             .ref()
@@ -347,6 +403,25 @@ myApp.controller("HomeController", ["$scope", "$http", "$document", "$timeout", 
 
 
     //MARK:------DATA SORTING / INIT
+
+    function findFriendRequests(){
+      console.log('users friends:', $scope.user.friends);
+      var temp = $scope.user.friends
+      var friends = [];
+      var requests = [];
+      temp.forEach(friend=>{
+        if(friend.is_friend){
+          friends.push(friend);
+        } else{
+          requests.push(friend);
+        }
+
+
+      })
+      $scope.user.friends = friends;
+      $scope.user.friendRequests = requests;
+    }
+    //finds folders to display deppening on $scope.currentFolderg
     function findFoldersToShow() {
         var current = $scope.currentFolder;
         var folders = _.uniq($scope.user.folders.map(folder => {
@@ -407,6 +482,35 @@ myApp.controller("HomeController", ["$scope", "$http", "$document", "$timeout", 
         })
         $scope.user.folders = folders;
     }
+
+    //checks if the user logged in is new, if new->promopt first time user window
+    function checkNewUser(dbRef, user) {
+        dbRef.once('value', data => {
+            console.log('all current users: ', data.val());
+            console.log('current user email: ', user.email)
+            var allUsers = makeSnapshotObject(data.val());
+            var newUser = true;
+            allUsers.forEach(x=>{
+              if(x.email == user.email){
+                newUser = false;
+              }
+            })
+            if(newUser){
+              console.log('newUser!!')
+              $timeout(function(){
+                $scope.newUser = true;
+                $scope.user.allUsers = allUsers
+              }, 0)
+            } else{
+              $timeout(function(){
+                $scope.newUser = false;
+                $scope.user.allUsers = allUsers
+              }, 0)
+            }
+
+        })
+    }
+
 
     //$function, command line tool
     //NOTE: must return true after functionality to bipass adding command to tasklist.
@@ -538,8 +642,24 @@ myApp.controller("HomeController", ["$scope", "$http", "$document", "$timeout", 
             if (commandString.substring(0, 7) == "friend ") {
                 //TODO:if friend doesnt exist in db -> check requested friends db so no multiples -> then execute code below
                 if (commandString.substring(7, 10) == "add") {
-                  var friendToAdd = commandString.substring(11);
-                  console.log(friendToAdd);
+                    var friendToAdd = commandString.substring(11);
+
+                    $scope.user.allUsers.forEach(m=>{
+                      if(m.email == friendToAdd && friendToAdd != $scope.user.email ){
+
+                        var friendDB = firebase.database()
+                        .ref()
+                        .child('frienddb')
+                        .child(m.uid)
+                        .push({email: $scope.user.email, uid: $scope.user.uid, is_friend: false});
+
+                      } else{
+                        alert('email not found in user database')
+                      }
+                    })
+
+
+
                 }
             }
             //NOTE: if refresh browser timers NEEDS to stay current. use Date.toString() and have a 'state' for each timer  in db;
@@ -698,7 +818,7 @@ myApp.controller("HomeController", ["$scope", "$http", "$document", "$timeout", 
             .set({
                 date: task.date,
                 title: task.title,
-                scrum: tempObj.scrum,
+                scrum: task.scrum,
                 folder: task.folder,
                 is_complete: task.is_complete
             });
