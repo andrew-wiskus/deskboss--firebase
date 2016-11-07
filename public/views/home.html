@@ -1,16 +1,61 @@
+
+<div class="background"></div>
+
+<div class="topNav">
+<p class="appTitle">deskboss.io</p>
+<p class="helpButton">?</p>
+<div ng-if="user != null" class="currentFolder">
+/ <span ng-click="clickedFolder(folder, $index)" ng-repeat="folder in currentFolderStructure track by $index">{{folder}}{{' ' + ($index != currentFolderStructure.length - 1 ? '/' : '')}}</span>
+<span ng-if="hasFolders == true" class="viewFolders" ng-click="toggleViewFolders()">{{showFolders == true ? 'hide ' : 'view '}} folders</span>
+</div>
+
+</div>
+
+
 <div ng-if="user != null">
 
+<div class="viewDisplay">
+  <p class="viewDisplay_item"> data displays will be here. </p>
+</div>
+<div class="dataDisplay">
+  <div class="commandHistory_Item" ng-repeat = "command in commandHistory track by $index">
+    {{command}}
+  </div>
+</div>
+<div class="taskDisplay">
+  <ng-include src="'views/partials/taskDisplay.html'"></ng-include>
+</div>
+<!--- COMMAND HISTORY WINDOW // FIXED AT 100PX FROM BOTTOM -->
+<div class="commandHistory"></div>
+<!---MAIN COMMAND LINE // FIXED TO BOTTOM OF SCREEN -60px -->
+<form class="commandLine">
+  <ng-include src="'views/partials/commandLine.html'"></ng-include>
+</form>
+<!-- SITE INFO/CONTACT/BUISNESS BS // FIXED TO BOTTOM OF SCREEN -->
+<div class="siteInfo"></div>
+
+
+
+
+
+
+
+<!-- <div class="topNav">
     <button ng-click="showCommands = !showCommands" class="headertext">command list</button>
     <button ng-click="showFriends = !showFriends">friends{{user.friendRequests.length != 0 ? '( ' + user.friendRequests.length + ' friend request' + (user.friendRequests.length > 1 ? 's ' : ' ') + ')' : ''}}</button>
     <button ng-click="showBugs = !showBugs"> bugs </button>
     <button ng-click="devAnnouncements= !devAnnouncements">dev blog</button>
     <button ng-click="showPojos = !showPojos"> pojos </button>
+</div> -->
+  <!-- <div class="rightDisplay">
+    <div ng-if="showPojos">
+        <ng-include src="'views/partials/pojos.html'"></ng-include>
+    </div>
+  </div>
+    <div class="leftDisplay">
     <div ng-if="devAnnouncements">
         <h4>dev blog</h4>
         <p>Blog Posts for le global db</p>
-    </div>
-    <div ng-if="showPojos">
-        <ng-include src="'views/partials/pojos.html'"></ng-include>
     </div>
     <div ng-if="showCommands">
         <ng-include src="'views/partials/commandList.html'"></ng-include>
@@ -21,29 +66,34 @@
     <div ng-show="showBugs">
         <ng-include src="'views/partials/bugList.html'"></ng-include>
     </div>
-
     <div ng-show="showTimer">
       <ng-include src="'views/partials/timer.html'"></ng-include>
     </div>
-
+  </div>
+    <div class="centerDisplay">
+    <div class="taskDisplay">
+        <ng-include src="'views/partials/taskDisplay.html'"></ng-include>
+    </div>
     <form class="commandLine">
       <ng-include src="'views/partials/commandLine.html'"></ng-include>
     </form>
-
-    <div>
-        <ng-include src="'views/partials/taskDisplay.html'"></ng-include>
-    </div>
+    </div> -->
 
 
-    <div class="newUser_popup" ng-if="newUser == true">
-      <ng-include src="'views/partials/newUser_popup.html'"></ng-include>
-   </div>
 
 
 </div>
 
+<div ng-if="newUser == true">
+  <div class="newUser_container">
+  <ng-include src="'views/partials/newUser_popup.html'"></ng-include>
+  </div>
+</div>
+
 <div ng-if="user == null">
+  <div class="noUser_container">
   <ng-include src="'views/partials/noUserLoggedIn.html'"></ng-include>
+</div>
 </div>
 
 

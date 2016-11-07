@@ -1,15 +1,32 @@
-<h4>Current Folder: {{currentFolder}}</h4>
+
+<div ng-if="showFolders == true" class="folderPopUp">
+<div class="folderItem" ng-repeat="folder in user.folders" ng-if="folder.show == true">
+  <p ng-click="clickedFolder(folder.folder)" class="folderText">{{folder.folder}}</p>
+</div>
+</div>
+
 <div ng-show="!task.is_complete && task.folder == currentFolder" ng-repeat="task in user.taskList">
-    <p class="taskListTitle" ng-if="task.edit != true"><button ng-click="scrumUp(task)">+</button><button ng-click="scrumDown(task)">-</button>scrum:{{task.scrum}}:{{task.title}}</p>
+  <!-- <div class="folders">
+    <span ng-repeat="folder in currentFolderStructure" ng-click="clickedfolder(folderName)" class="folderName"> {{folderName}} </span>
+  </div> -->
+
+  <div class="x">
+      <button class="taskButton taskButton1" ng-click="deleteTask(task)">DELETE</button>
+      <button class="taskButton taskButton1" ng-if="task.edit != true" ng-click="task.edit = !task.edit">EDIT</button>
+      <button class="taskButton" ng-click="completeTask(task)">DONE!</button>
+</div>
+
+    <div class="taskListItem" ng-if="task.edit != true">
+
+            <span class ="scrumIncrementor" ng-click="scrumDown(task)">-</span>
+            <span class ="scrumIncrementor" ng-click="scrumUp(task)">+</span>
+            <span class="scrumCount">{{' #' + task.scrum}}</span>
+            <span class="taskTitle"> {{task.title}}  </span>
+
+    </div>
     <form ng-if="task.edit == true">
         <input type="text" ng-model="task.title" value="task.title"></input>
         <button type="submit" ng-click="editTask(task)">SAVE</button> <button ng-click="task.edit = !task.edit">CANCEL</button>
     </form>
-    <button ng-click="completeTask(task)">DONE!</button>
-    <button ng-click="deleteTask(task)">DELETE</button>
-    <button ng-if="task.edit != true" ng-click="task.edit = !task.edit">EDIT</button>
-</div>
-<button ng-click="goToParentFolder()">BACK</button> ---folders-----
-<div ng-click="clickedFolder(folder.folder)" ng-if='folder.show' ng-repeat="folder in user.folders">
-    {{folder.folder}}
+
 </div>

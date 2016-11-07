@@ -1,3 +1,9 @@
-<h3 class="commandLineText">commandline</h3>
-<input ng-trim="false" class="commandLine" type="text" ng-model="newTask.title" ng-value="newTask.title"></input>
-<button type="submit" ng-click="addTask(newTask)">+</button>
+<!-- <h3 class="commandLineText">commandline</h3> -->
+<input ng-trim="false" class="commandLine_input" type="text" ng-model="newTask.title" ng-value="newTask.title"></input>
+<button ng-show="1 == 2" type="submit" ng-click="addTask(newTask)">+</button>
+<!-- <br/>
+<h4 class="currentFolder_display">Current Folder: {{currentFolder}}</h4>
+<button ng-click="goToParentFolder()">BACK</button> ---folders-----
+<div ng-click="clickedFolder(folder.folder)" ng-if='folder.show' ng-repeat="folder in user.folders">
+    {{folder.folder}}
+</div> -->

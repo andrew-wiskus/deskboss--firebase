@@ -1,5 +1,5 @@
 myApp.controller("HomeController", ["$scope", "$http", "$document", "$timeout", "$location", 'AuthFactory', 'UserFactory', function($scope, $http, $document, $timeout, $location, AuthFactory, UserFactory) {
-    console.log("HomeController works");
+
 
 
     //KEY EVENT LISTENER !!! SO COOL :D
@@ -57,7 +57,10 @@ myApp.controller("HomeController", ["$scope", "$http", "$document", "$timeout", 
     // };
 
     //show/hide filter variables
+    $scope.commandHistory = ["welcome to deskboss.io :). \nalpha, v 0.11", "NOTE: Currently this app is optimized for fullscreen in chrome, in fullscreen use CMD+SHIFT+F to hide toolbar", "please use $bug command to notify me of anything, suggestions/critisim welcome as well :)", "use $help to view commands, $cl to clear this window. \nthanks again, ", "drew.wiskus" ];
+    $scope.currentFolderStructure = ['main / ', 'new / ', 'works'];
     $scope.showTimer = false;
+    $scope.showFolders = false;
     $scope.showCompleted = false;
     $scope.currentFolder = 'main'
     $scope.showBugs = false;
@@ -75,6 +78,7 @@ myApp.controller("HomeController", ["$scope", "$http", "$document", "$timeout", 
         in_folder: null
     }
     $scope.timer = {};
+    $scope.hasFolders = false;
     //auth variables
     var userFactory = UserFactory;
     var signIn = userFactory.signIn();
@@ -123,9 +127,29 @@ myApp.controller("HomeController", ["$scope", "$http", "$document", "$timeout", 
         })
       })
     }
-    $scope.clickedFolder = function(folder) {
-        $scope.currentFolder = folder;
-        findFoldersToShow();
+    $scope.clickedFolder = function(folder, index) {
+        console.log(folder)
+        console.log(index);
+        if(index == 0 || index == undefined){
+          $scope.commandHistory.push("CHANGING DIRECTORY TO: " + folder)
+          $scope.currentFolder = folder;
+          findFoldersToShow();
+        } else {
+          var newFolder = ''
+          $scope.currentFolderStructure.forEach(function(e,i){
+            if (i < index){
+              newFolder += e;
+              newFolder += '/'
+            } else if(i == index){
+              newFolder += e;
+            }
+
+          })
+          $scope.commandHistory.push("CHANGING DIRECTORY TO: " + newFolder)
+          $scope.currentFolder = newFolder;
+          findFoldersToShow();
+        }
+
 
     }
     $scope.login = function() {
@@ -153,6 +177,9 @@ myApp.controller("HomeController", ["$scope", "$http", "$document", "$timeout", 
         }
 
 
+    }
+    $scope.toggleViewFolders = function(){
+      $scope.showFolders = !$scope.showFolders;
     }
     $scope.fixBug = function(bug) {
             var bugRef = firebase.database()
@@ -408,6 +435,7 @@ myApp.controller("HomeController", ["$scope", "$http", "$document", "$timeout", 
 
         user_tasklist.push(newTaskObject);
         $scope.newTask.title = "";
+        $scope.commandHistory.push("NEWTASK:     /" + $scope.currentFolder + "/" + taskTitle)
     }
 
 
@@ -491,7 +519,21 @@ myApp.controller("HomeController", ["$scope", "$http", "$document", "$timeout", 
             };
 
         })
+
+        var foldercount = 0;
+        folders.forEach(x=>{
+          if(x.show == true){
+            foldercount++
+          }
+        })
+        if(foldercount > 0){
+          $scope.hasFolders = true;
+        } else{
+          $scope.hasFolders = false;
+        }
+        $scope.currentFolderStructure = $scope.currentFolder.split('/');
         $scope.user.folders = folders;
+
     }
 
     //checks if the user logged in is new, if new->promopt first time user window
@@ -531,6 +573,7 @@ myApp.controller("HomeController", ["$scope", "$http", "$document", "$timeout", 
             $scope.currentFolder = 'main';
             findFoldersToShow()
             $scope.newTask = {};
+            $scope.commandHistory.push("CHANGE DIRECTORY: /main");
             return true;
         }
 
@@ -550,7 +593,8 @@ myApp.controller("HomeController", ["$scope", "$http", "$document", "$timeout", 
                 if (commandString.substring(4) == '..') {
                     if ($scope.currentFolder == 'main') {
                         $scope.newTask.title = '';
-                        alert('sorry you can\'t go further up the folder tree, u at the top son')
+                        $scope.commandHistory.push("ERROR: NO PARENT DIRECTORY");
+                        // alert('sorry you can\'t go further up the folder tree, u at the top son')
                         return true;
                     }
                     //TODO: PUT INTO FUNCTION PLX SO MESSY :)
@@ -564,6 +608,7 @@ myApp.controller("HomeController", ["$scope", "$http", "$document", "$timeout", 
                         } else if (index != folders.length - 1) {
                             newDir += (folderName);
                         } else {
+                            $scope.commandHistory.push("CHANGING TO PARENT DIRECTORY: " + newDir)
                             $scope.currentFolder = newDir;
                             findFoldersToShow()
                         }
@@ -578,7 +623,9 @@ myApp.controller("HomeController", ["$scope", "$http", "$document", "$timeout", 
 
                 //NOTE: CATCHALL:
                 //$dir dirName == (cd dirName || mkdir dirName);
+
                 $scope.currentFolder += '/' + commandString.substring(4);
+                $scope.commandHistory.push("CHANGING TO DIRECTORY: " + $scope.currentFolder);
                 findFoldersToShow();
                 $scope.newTask.title = '';
             }
@@ -602,21 +649,23 @@ myApp.controller("HomeController", ["$scope", "$http", "$document", "$timeout", 
                 if (tasksToDelete.length != 0) {
                     //alert with tasks that will be deleted
                     //TODO: MAKE BETTER CONFIRM STRING :)
-                    var confirmString = '\nWARNING!! THIS WILL DELETE THE FALLOWING TASKS:\n';
+                    var confirmString = '\nDELETE TASKS:\n';
                     tasksToDelete.map(function(task, i) {
                         confirmString += ((i + 1) + '. ' + task.title + '\nin: ' + task.folder + '\n');
                     })
 
 
                     if (confirm(confirmString)) {
-                        console.log('pressed yes');
+
                         $scope.newTask.title = '';
+                        $scope.commandHistory.push("DELETED DIRECTORY " + deleteString + ", TASKS DELETED: " + tasksToDelete.length)
                         tasksToDelete.forEach(function(task) {
                             deleteTask(task);
                         })
                     } else {
                         $scope.newTask.title = '';
-                        console.log('pressed no');
+
+                        $scope.commandHistory.push("DELETE DIRECTORY CANCELED")
                     }
                 } else {
                     //alert sayin there was no tasks
@@ -633,7 +682,8 @@ myApp.controller("HomeController", ["$scope", "$http", "$document", "$timeout", 
                 var command = commandString.substring(4);
                 $scope.newTask.title = '';
                 var bug = findScrum(command)
-                console.log('bug', bug);
+
+                $scope.commandHistory.push("ADDED BUG TO GLOBAL BUG DB: " + bug.title);
                 var dbRef = firebase.database()
                     .ref()
                     .child('taskdb')
@@ -654,24 +704,40 @@ myApp.controller("HomeController", ["$scope", "$http", "$document", "$timeout", 
                 //TODO:if friend doesnt exist in db -> check requested friends db so no multiples -> then execute code below
                 if (commandString.substring(7, 10) == "add") {
                     var friendToAdd = commandString.substring(11);
-
+                    var isEmail = false;
                     $scope.user.allUsers.forEach(m=>{
                       if(m.email == friendToAdd && friendToAdd != $scope.user.email ){
-
+                        isEmail = true;
+                        $scope.commandHistory.push("FRIEND REQUEST SENT TO: " + m.email);
                         var friendDB = firebase.database()
                         .ref()
                         .child('frienddb')
                         .child(m.uid)
                         .push({email: $scope.user.email, uid: $scope.user.uid, is_friend: false});
 
-                      } else{
-                        alert('email not found in user database')
                       }
                     })
+
+                    if(isEmail == false){
+
+                        // alert('email not found in user database')
+                        $scope.commandHistory.push("ERROR: REQUEST NOT SENT, EMAIL NOT FOUND IN DB")
+
+                    }
 
 
 
                 }
+            }
+
+            if(commandString == "cl"){
+              $scope.commandHistory = [];
+              $scope.newTask.title = '';
+            }
+
+            if(commandString == "help"){
+              $scope.commandHistory.push("OPENING HELP MENU");
+              $scope.showHelp = true;
             }
             //NOTE: if refresh browser timers NEEDS to stay current. use Date.toString() and have a 'state' for each timer  in db;
             //NOTE: use new Date(task.date).getTime() to compare seconds between tasks ?

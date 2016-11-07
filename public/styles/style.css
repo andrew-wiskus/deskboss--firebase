@@ -1,16 +1,273 @@
 main{
-  padding-left: 100px;
-  font-family: helvetica;
 }
 
-form {
+input{
+  padding: 0;
+  margin: 0;
+}
+
+*{
+  -moz-box-sizing:    border-box;
+  -webkit-box-sizing: border-box;
+   box-sizing:        border-box;
+   color: #FCFFEB;
+   font-family: helvetica;
+}
+
+.background{
+  width: 100%;
+  height: 100%;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 0;
+  background-color:#371423;
+  border-left: 3px solid #FAFAC6;
+  border-right: 3px solid #FAFAC6;
+}
+
+/* ------------------------- TOP FIXED NAV -------------------------*/
+.topNav{
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 40px;
+  background-color: #371423;
+  border: 3px solid #FAFAC6;
+  z-index: 9999
+}
+
+.appTitle{
+  padding-left: 30px;
+  display: inline-block;
+  width: 100px;
+  margin-bottom: 10px;
+  position: relative;
+  bottom: 5px;
+}
+.helpButton{
+  float: right;
+  margin-right: 30px;
+  margin-bottom: 10px;
+  position: relative;
+  bottom: 5px;
+}
+
+.viewFolders{
+  font-size: 14px;
+  font-weight: lighter;
+  cursor: pointer;
+}
+.currentFolder{
+  position: fixed;
+  font-size: 24px;
+  font-weight: bold;
+  top: 10px;
+  left: 38.2%;
+  padding-left: 10px;
+
 
 }
+/*------------------------- MAIN BASE CONTAINERS -------------------------*/
+
+
+.dataDisplay{
+  width: 61.8%;
+  border-left: 3px solid #FAFAC6;
+  border-right: 3px solid #FAFAC6;
+  left: 38.2%;
+  top: 61.8%;
+  z-index: 99;
+  height: 38.2%;
+  position: fixed;
+  padding-bottom: 100px;
+  padding-left: 10px;
+  overflow-y;
+}
+
+.taskDisplay{
+  position: fixed;
+  top: 0%;
+  height: 61.8%;
+  padding-top: 45px;
+  overflow-y: scroll;
+  left:38.2%;
+  z-index: 100;
+  width: 61.8%;
+  border: 3px solid #FAFAC6;
+  padding-left: 10px;
+  padding-bottom: 20px;
+
+}
+
+.viewDisplay_item{
+  font-size: 22px;
+}
+
+.viewDisplay{
+  padding-top: 50px;
+  width: 38.2%;
+  height: 100%;
+  background-color: #371423;
+  border-left: 3px solid #FAFAC6;
+  z-index: 100;
+  position: fixed;
+  top: 0;
+  left: 0;
+}
+
+
+/*------------------ COMMAND HISTORY / TERMINAL DISPLAY ------------------*/
+.commandHistory{
+  width: 100%;
+  height: 15%;
+  background-color: #371423;
+  position:fixed;
+  left: 0;
+  bottom: 100px;
+  border-left: 3px solid #FAFAC6;
+  border-right: 3px solid #FAFAC6;
+}
+
+.commandHistory_Item{
+  margin-top: 10px;
+}
+
+
+/* ------------------ TASK LIST ------------------ */
+
+.taskListItem  {
+  font-size: 20px;
+  font-weight: lighter;
+  margin-top:3px;
+  margin-bottom: 3px;
+}
+
 .taskListTitle{
   display: inline-block;
-  width: 450px;
   font-size: 12px;
   margin: 3px;
+  font-size: 20px;
+  font-weight: lighter;
+}
+
+
+
+.taskButton{
+  float: right;
+  margin-right: 20px;
+  opacity: 1;
+  background-color: #371423;
+  outline: none;
+  border: none;
+  margin-top: 3px;
+}
+.taskButton:hover{
+  background-color: #FCFFEB;
+  opacity: 0.5;
+  color: #371423;
+}
+.x:hover + .taskListItem {
+    background-color: #ccc !important;
+}
+
+/* ------------------ COMMAND LINE ------------------*/
+.commandLine{
+  position: fixed;
+  bottom:60px;
+  left: 0;
+  width: 100%;
+  z-index: 900;
+}
+
+.commandLine_input{
+width: 100%;
+height: 40px;
+background-color: #371423;
+border: 3px solid #FAFAC6;
+padding-left: 10%;
+font-size: 30px;
+font-weight: lighter;
+
+}
+
+.commandLine_input:focus{
+  /*border: 3px solid #FAFAC6;*/
+  outline-color: #FAFAC6;
+}
+
+
+
+/*----------------------- BOTTOM BOX, FUTURE MAY HOLD SITE INFO? -----------------------*/
+.siteInfo{
+  width: 100%;
+  height: 60px;
+  background-color: #371423;
+  /*border: 1px solid #FAFAC6;*/
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  border-left: 3px solid #FAFAC6;
+  border-right: 3px solid #FAFAC6;
+  z-index: 900;
+}
+
+.noUser_container{
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  z-index: 9999;
+  background-color: #371423;
+
+  top: 0;
+  left: 0;
+  padding-left: 200px;
+  padding-top: 200px;
+
+}
+
+.newUser_container{
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  z-index: 99999;
+  background-color: #371423;
+
+  top: 0;
+  left: 0;
+  padding-left: 200px;
+  padding-top: 200px;
+}
+
+.newUser_username{
+  width: 300px;
+  height: 30px;
+  display: block;
+  font-size: 20px;
+  text-align: center;
+  background-color: #371423;
+    border: 3px solid #FAFAC6;
+    /*border-bottom: 0;*/
+}
+
+.spaceAlert{
+  margin-top: 30px;
+}
+.createAccountButton{
+  background-color: #371423;
+    border: 3px solid #FAFAC6;
+    width: 300px;
+    height: 30px;
+    font-size: 15px;
+    margin-top: 30px;
+}
+.loginButton{
+  width: 300px;
+  height: 30px;
+  font-size: 25px;
+  border: 3px solid #FAFAC6;
+  background-color: #371423;
 }
 .newUser_popup{
   width: 100%;
@@ -23,8 +280,4 @@ form {
   padding-top: 200px;
   padding-left: 200px;
   font-size: 20px;
-}
-
-.commandLine{
-  width: 500px;
 }

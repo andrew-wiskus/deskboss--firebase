@@ -1,7 +1,11 @@
+
 <h2>Welcome New User!</h2>
 <h4>to deskboss.io :)</h4>
 
 <br/>
 <p>please enter username(no spaces):</p>
+<h3>{{newUserName.length != 0 ? "@" + newUserName : ""}}</h3>
+
 <input class="newUser_username" type="text" ng-model="newUserName" />
-<button ng-click="addNewUser(newUserName, user)">
+<div class="spaceAlert">{{newUserName.search(' ') != -1 ? 'spaces arent allowed, try: user.name/user_name ' : ''}} </div>
+<button ng-if="newUserName.search(' ') == -1" class="createAccountButton" ng-click="addNewUser(newUserName, user)">CREATE ACCOUNT</button>
