@@ -15,14 +15,33 @@
 <div ng-if="user != null">
 
 <div class="viewDisplay">
-  <p class="viewDisplay_item"> data displays will be here. </p>
-</div>
-<div class="dataDisplay">
-  <div class="commandHistory_Item" ng-repeat = "command in commandHistory track by $index">
-    {{command}}
+  <!-- <p class="viewDisplay_item"> data displays will be here. </p> -->
+  <div ng-if="showHelp" class="helpText">
+    <h4> BLING FUNCTIONS (click to see details)</h4>
+    <p><span ng-click="showCommand1 = !showCommand1"class="helpTextCommand">$help <br/></span>                                                                                        <span class="commandInfo" ng-if="showCommand1"> -show help</p>
+    <p><span ng-click="showCommand2 = !showCommand2"class="helpTextCommand">$bug foobar #1<br/></span>                                                                               <span class="commandInfo" ng-if="showCommand2"> -sends a bug ticket "foobar" to bug database. priority added with #, 1: low interference -- 9: app breaking interference </p>
+    <p><span ng-click="showCommand3 = !showCommand3"class="helpTextCommand">$delete main/foo/bar <br/></span>                                                                         <span class="commandInfo" ng-if="showCommand3">-deletes folder 'main/foo/bar' and all children task/folders. will prompt confirmation window</p>
+    <p><span ng-click="showCommand4 = !showCommand4"class="helpTextCommand">$dir foo <br/></span>                                                                                     <span class="commandInfo" ng-if="showCommand4">-changes to directory 'currentfolder/foo'. NOTE: will create a new folder if folder does not exist. PRO-TIP: If you create a folder within a folder that doesnt hold a task you create a 'secret folder'. This 'secret folder' can only be accessed by $dir into its parent folder, the parent folder will not show up in any gui so you can think of it as a secret key/refrence. $dir secretFolderKey -> $dir innerSecretFolder == /main/secretFolderKey/innerSecretFolder. this will not show up on the ui :) neato eh? </p>
+    <p><span ng-click="showCommand5 = !showCommand5"class="helpTextCommand">$dir .. <br/></span>                                                                                      <span class="commandInfo" ng-if="showCommand5">-changes directory to parent folder. ex: current folder="/main/foo/bar", $dir .. -> current folder = "/main/foo"</p>
+    <p><span ng-click="showCommand6 = !showCommand6"class="helpTextCommand">$dir ~ <br/></span>                                                                                       <span class="commandInfo" ng-if="showCommand6">- changes directory to '/main'</p>
+    <p><span ng-click="showCommand7 = !showCommand7"class="helpTextCommand">$cl <br/></span>                                                                                          <span class="commandInfo" ng-if="showCommand7">- clears command terminal</p>
+    <p><span ng-click="showCommand8 = !showCommand8"class="helpTextCommand">$friend add foo@email.com <br/></span>                                                                    <span class="commandInfo" ng-if="showCommand8">-searches for user with foo@email.com and sends a request</p>
+    <p><span ng-click="showCommand9 = !showCommand9"class="helpTextCommand wip">WIP: $pojo create / $pojo invite<br/></span>                                                              <span class="commandInfo" ng-if="showCommand9"> -share tasks between friends/coworkers in a 'Pojo'</p>
+    <p><span ng-click="showCommand10 = !showCommand10"class="helpTextCommand wip">WIP: $sprint<br/></span>                                                                                <span class="commandInfo" ng-if="showCommand10"> -creates timer ui where you can add tasks to a list and try to complete them during the timer, a 'sprint'</p>
+    <p><span ng-click="showCommand11 = !showCommand11"class="helpTextCommand wip">WIP: $pm friendsemail@email.com foobar<br/></span>                                                      <span class="commandInfo" ng-if="showCommand11"> -sends message to user email from friends list</p>
+    <p><span ng-click="showCommand12 = !showCommand12" class="helpTextCommand wip">WIP: $view (pojo, friend, sprint, chat, folders, futureWindows)<br/> </span>                           <span class="commandInfo" ng-if="showCommand12"> -opens a tabbable window with seperate command line/ui in left section of screen </p>
+    <h4> KEYBOARD SHORTCUTS </h4>
+    <p> <span class="helpTextCommand">type $ and press TAB to cycle through avaliable commands </p>
+    <p> <span class="helpTextCommand wip">WIP: press TAB to auto complete if partial string is unique. $dir newFo (press tab, auto completes)-> $dir newFolder </p>
+
   </div>
 </div>
-<div class="taskDisplay">
+<div id="commandHistory" class="dataDisplay">
+  <div class="commandHistory_Item" ng-repeat = "command in commandHistory track by $index">
+    <div id="{{'hisory' + $index}}">{{command}}</div>
+  </div>
+</div>
+<div id="taskList" class="taskDisplay">
   <ng-include src="'views/partials/taskDisplay.html'"></ng-include>
 </div>
 <!--- COMMAND HISTORY WINDOW // FIXED AT 100PX FROM BOTTOM -->
@@ -84,7 +103,7 @@
 
 </div>
 
-<div ng-if="newUser == true">
+<div ng-if="newUser == true && user != null">
   <div class="newUser_container">
   <ng-include src="'views/partials/newUser_popup.html'"></ng-include>
   </div>

@@ -1,4 +1,6 @@
-myApp.controller("HomeController", ["$scope", "$http", "$document", "$timeout", "$location", 'AuthFactory', 'UserFactory', function($scope, $http, $document, $timeout, $location, AuthFactory, UserFactory) {
+myApp.controller("HomeController", ["$scope", "$http", "$document", "$timeout", "$location", "$anchorScroll", 'AuthFactory', 'UserFactory', function($scope, $http, $document, $timeout, $location, $anchorScroll, AuthFactory, UserFactory) {
+
+
 
 
 
@@ -57,7 +59,7 @@ myApp.controller("HomeController", ["$scope", "$http", "$document", "$timeout", 
     // };
 
     //show/hide filter variables
-    $scope.commandHistory = ["welcome to deskboss.io :). \nalpha, v 0.11", "NOTE: Currently this app is optimized for fullscreen in chrome, in fullscreen use CMD+SHIFT+F to hide toolbar", "please use $bug command to notify me of anything, suggestions/critisim welcome as well :)", "use $help to view commands, $cl to clear this window. \nthanks again, ", "drew.wiskus" ];
+    $scope.commandHistory = ["welcome to deskboss.io :). \nalpha, v 0.13", "NOTE: Currently this app looks best in fullscreen:chrome, in fullscreen use CMD+SHIFT+F to hide toolbar", "type $help to see commands, $tutorial comming soon :) happy tasking", "@drew.wiskus", " ", "protip: use $cl to clear this window"];
     $scope.currentFolderStructure = ['main / ', 'new / ', 'works'];
     $scope.showTimer = false;
     $scope.showFolders = false;
@@ -69,7 +71,7 @@ myApp.controller("HomeController", ["$scope", "$http", "$document", "$timeout", 
     $scope.showPojo = false;
     $scope.newUser = true;
     $scope.newUserName = ''
-    //info objects
+        //info objects
     $scope.auth = AuthFactory;
     $scope.user;
     $scope.newTask = {
@@ -93,61 +95,67 @@ myApp.controller("HomeController", ["$scope", "$http", "$document", "$timeout", 
 
 
     //clickfunctions
-    $scope.addFriend = function(friend){
-      var friendDB = firebase.database()
-      .ref()
-      .child('frienddb')
-      .child($scope.user.uid)
+    $scope.addFriend = function(friend) {
+        var friendDB = firebase.database()
+            .ref()
+            .child('frienddb')
+            .child($scope.user.uid)
 
-      friendDB.once('value', data=>{
-        var friends = makeSnapshotObject(data.val());
-        friends.forEach(f=>{
-          if(f.uid == friend.uid){
-            friendDB.child(f.key).child('is_friend').set(true)
-          }
+        friendDB.once('value', data => {
+            var friends = makeSnapshotObject(data.val());
+            friends.forEach(f => {
+                if (f.uid == friend.uid) {
+                    friendDB.child(f.key)
+                        .child('is_friend')
+                        .set(true)
+                }
 
 
-        })
-      });
+            })
+        });
 
     }
-    $scope.denyFriend = function(friend){
-      var friendDB = firebase.database()
-      .ref()
-      .child('frienddb')
-      .child($scope.user.uid)
+    $scope.denyFriend = function(friend) {
+        var friendDB = firebase.database()
+            .ref()
+            .child('frienddb')
+            .child($scope.user.uid)
 
-      friendDB.once('value', data=>{
-        var friends = makeSnapshotObject(data.val());
-        friends.forEach(f=>{
-          if(f.uid == friend.uid){
-            friendDB.child(f.key).remove();
+        friendDB.once('value', data => {
+            var friends = makeSnapshotObject(data.val());
+            friends.forEach(f => {
+                if (f.uid == friend.uid) {
+                    friendDB.child(f.key)
+                        .remove();
 
-          }
+                }
+            })
         })
-      })
     }
     $scope.clickedFolder = function(folder, index) {
         console.log(folder)
         console.log(index);
-        if(index == 0 || index == undefined){
-          $scope.commandHistory.push("CHANGING DIRECTORY TO: " + folder)
-          $scope.currentFolder = folder;
-          findFoldersToShow();
-        } else {
-          var newFolder = ''
-          $scope.currentFolderStructure.forEach(function(e,i){
-            if (i < index){
-              newFolder += e;
-              newFolder += '/'
-            } else if(i == index){
-              newFolder += e;
-            }
+        var date = new Date()
+        var datestring = date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds() + "   " + $scope.currentFolder + ': ';
 
-          })
-          $scope.commandHistory.push("CHANGING DIRECTORY TO: " + newFolder)
-          $scope.currentFolder = newFolder;
-          findFoldersToShow();
+        if (index == 0 || index == undefined) {
+            $scope.commandHistory.push(datestring + "Clicked on: " + folder + " -> changing directory")
+            $scope.currentFolder = folder;
+            findFoldersToShow();
+        } else {
+            var newFolder = ''
+            $scope.currentFolderStructure.forEach(function(e, i) {
+                if (i < index) {
+                    newFolder += e;
+                    newFolder += '/'
+                } else if (i == index) {
+                    newFolder += e;
+                }
+
+            })
+            $scope.commandHistory.push(datestring + "Clicked on: " + newFolder + "-> changing directory")
+            $scope.currentFolder = newFolder;
+            findFoldersToShow();
         }
 
 
@@ -178,8 +186,8 @@ myApp.controller("HomeController", ["$scope", "$http", "$document", "$timeout", 
 
 
     }
-    $scope.toggleViewFolders = function(){
-      $scope.showFolders = !$scope.showFolders;
+    $scope.toggleViewFolders = function() {
+        $scope.showFolders = !$scope.showFolders;
     }
     $scope.fixBug = function(bug) {
             var bugRef = firebase.database()
@@ -260,10 +268,10 @@ myApp.controller("HomeController", ["$scope", "$http", "$document", "$timeout", 
         }
     }
     $scope.addNewUser = function(newUser, user) {
-      // console.log(user, newUser)
+        // console.log(user, newUser)
         var dbRef = firebase.database()
-        .ref()
-        .child('userdb');
+            .ref()
+            .child('userdb');
 
         dbRef.push({
                 name: newUser,
@@ -272,9 +280,9 @@ myApp.controller("HomeController", ["$scope", "$http", "$document", "$timeout", 
                 profile_picture: null
             }) // other public info?
 
-        $timeout(function(){
-          $scope.newUser = false;
-        },0)
+        $timeout(function() {
+            $scope.newUser = false;
+        }, 0)
 
     }
 
@@ -322,19 +330,19 @@ myApp.controller("HomeController", ["$scope", "$http", "$document", "$timeout", 
 
             // pojoRef.push({members:['wskcontact@gmail.com', 'andrewwiskus@gmail.com'], taskList: [{scrum:2,title:'make this work'}, {scrum:5, title:'fix this ish'}], title: 'myfirstpojo'});
             //badbadbadbadbad TODO: OPTIMIZE THIS //WILL CAUSE PROBLEMS IN FUTURE IF YOU DONT!!
-            pojoRef.on('value', data=>{
-              var userPojos = [];
-              var pojos = makeSnapshotObject(data.val()) // yes.. we're listening for all of them atm and pulling all in.. wtf
-              pojos.forEach(pojo=>{
-                var isMember = _.indexOf(pojo.members, user.email);
-                if(isMember != -1){
-                  userPojos.push(pojo);
-                }
-              })
+            pojoRef.on('value', data => {
+                var userPojos = [];
+                var pojos = makeSnapshotObject(data.val()) // yes.. we're listening for all of them atm and pulling all in.. wtf
+                pojos.forEach(pojo => {
+                    var isMember = _.indexOf(pojo.members, user.email);
+                    if (isMember != -1) {
+                        userPojos.push(pojo);
+                    }
+                })
 
-              $timeout(function(){
-                $scope.user.pojos = userPojos;
-              },0)
+                $timeout(function() {
+                    $scope.user.pojos = userPojos;
+                }, 0)
 
             });
 
@@ -404,8 +412,12 @@ myApp.controller("HomeController", ["$scope", "$http", "$document", "$timeout", 
     //MARK:------POST REQUEST
     $scope.addTask = function(taskObject, user) {
 
-        if (commandCheck(taskObject.title)) {
+        var date = new Date()
+        var datestring = date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds() + '   ' + $scope.currentFolder + ': ';
 
+
+        if (commandCheck(taskObject.title)) {
+            $scope.newTask.title = '';
             return;
         }
 
@@ -433,9 +445,14 @@ myApp.controller("HomeController", ["$scope", "$http", "$document", "$timeout", 
             .child('taskdb')
             .child(id);
 
+
         user_tasklist.push(newTaskObject);
         $scope.newTask.title = "";
-        $scope.commandHistory.push("NEWTASK:     /" + $scope.currentFolder + "/" + taskTitle)
+        var objDiv = document.getElementById("taskList");
+        objDiv.scrollTop = objDiv.scrollHeight;
+        $scope.commandHistory.push(datestring + "adding task:     /" + $scope.currentFolder + "/" + taskTitle)
+        var objDiv = document.getElementById("commandHistory");
+        objDiv.scrollTop = objDiv.scrollHeight;
     }
 
 
@@ -443,22 +460,22 @@ myApp.controller("HomeController", ["$scope", "$http", "$document", "$timeout", 
 
     //MARK:------DATA SORTING / INIT
 
-    function findFriendRequests(){
-      console.log('users friends:', $scope.user.friends);
-      var temp = $scope.user.friends
-      var friends = [];
-      var requests = [];
-      temp.forEach(friend=>{
-        if(friend.is_friend){
-          friends.push(friend);
-        } else{
-          requests.push(friend);
-        }
+    function findFriendRequests() {
+        console.log('users friends:', $scope.user.friends);
+        var temp = $scope.user.friends
+        var friends = [];
+        var requests = [];
+        temp.forEach(friend => {
+            if (friend.is_friend) {
+                friends.push(friend);
+            } else {
+                requests.push(friend);
+            }
 
 
-      })
-      $scope.user.friends = friends;
-      $scope.user.friendRequests = requests;
+        })
+        $scope.user.friends = friends;
+        $scope.user.friendRequests = requests;
     }
     //finds folders to display deppening on $scope.currentFolderg
     function findFoldersToShow() {
@@ -521,15 +538,15 @@ myApp.controller("HomeController", ["$scope", "$http", "$document", "$timeout", 
         })
 
         var foldercount = 0;
-        folders.forEach(x=>{
-          if(x.show == true){
-            foldercount++
-          }
+        folders.forEach(x => {
+            if (x.show == true) {
+                foldercount++
+            }
         })
-        if(foldercount > 0){
-          $scope.hasFolders = true;
-        } else{
-          $scope.hasFolders = false;
+        if (foldercount > 0) {
+            $scope.hasFolders = true;
+        } else {
+            $scope.hasFolders = false;
         }
         $scope.currentFolderStructure = $scope.currentFolder.split('/');
         $scope.user.folders = folders;
@@ -543,22 +560,22 @@ myApp.controller("HomeController", ["$scope", "$http", "$document", "$timeout", 
             console.log('current user email: ', user.email)
             var allUsers = makeSnapshotObject(data.val());
             var newUser = true;
-            allUsers.forEach(x=>{
-              if(x.email == user.email){
-                newUser = false;
-              }
+            allUsers.forEach(x => {
+                if (x.email == user.email) {
+                    newUser = false;
+                }
             })
-            if(newUser){
-              console.log('newUser!!')
-              $timeout(function(){
-                $scope.newUser = true;
-                $scope.user.allUsers = allUsers
-              }, 0)
-            } else{
-              $timeout(function(){
-                $scope.newUser = false;
-                $scope.user.allUsers = allUsers
-              }, 0)
+            if (newUser) {
+                console.log('newUser!!')
+                $timeout(function() {
+                    $scope.newUser = true;
+                    $scope.user.allUsers = allUsers
+                }, 0)
+            } else {
+                $timeout(function() {
+                    $scope.newUser = false;
+                    $scope.user.allUsers = allUsers
+                }, 0)
             }
 
         })
@@ -569,11 +586,17 @@ myApp.controller("HomeController", ["$scope", "$http", "$document", "$timeout", 
     //NOTE: must return true after functionality to bipass adding command to tasklist.
     function commandCheck(str) {
         // ~ == cd ~
-        if (str == '~') {
+
+        var date = new Date()
+        var datestring = date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds() + '   ' + $scope.currentFolder + ': ';
+
+        if (str == '$dir ~') {
             $scope.currentFolder = 'main';
             findFoldersToShow()
             $scope.newTask = {};
-            $scope.commandHistory.push("CHANGE DIRECTORY: /main");
+            $scope.commandHistory.push(datestring + "$dir ~ -> changing directory to /main");
+            var objDiv = document.getElementById("commandHistory");
+            objDiv.scrollTop = objDiv.scrollHeight;
             return true;
         }
 
@@ -593,7 +616,9 @@ myApp.controller("HomeController", ["$scope", "$http", "$document", "$timeout", 
                 if (commandString.substring(4) == '..') {
                     if ($scope.currentFolder == 'main') {
                         $scope.newTask.title = '';
-                        $scope.commandHistory.push("ERROR: NO PARENT DIRECTORY");
+                        $scope.commandHistory.push(datestring + "ERROR: NO PARENT DIRECTORY");
+                        var objDiv = document.getElementById("commandHistory");
+                        objDiv.scrollTop = objDiv.scrollHeight;
                         // alert('sorry you can\'t go further up the folder tree, u at the top son')
                         return true;
                     }
@@ -608,7 +633,7 @@ myApp.controller("HomeController", ["$scope", "$http", "$document", "$timeout", 
                         } else if (index != folders.length - 1) {
                             newDir += (folderName);
                         } else {
-                            $scope.commandHistory.push("CHANGING TO PARENT DIRECTORY: " + newDir)
+                            $scope.commandHistory.push(datestring + "$dir .. -> moving to parent directory: " + newDir)
                             $scope.currentFolder = newDir;
                             findFoldersToShow()
                         }
@@ -625,7 +650,9 @@ myApp.controller("HomeController", ["$scope", "$http", "$document", "$timeout", 
                 //$dir dirName == (cd dirName || mkdir dirName);
 
                 $scope.currentFolder += '/' + commandString.substring(4);
-                $scope.commandHistory.push("CHANGING TO DIRECTORY: " + $scope.currentFolder);
+                $scope.commandHistory.push(datestring + "$dir " + commandString.substring(4) + " -> changing directory to: " + $scope.currentFolder);
+                var objDiv = document.getElementById("commandHistory");
+                objDiv.scrollTop = objDiv.scrollHeight;
                 findFoldersToShow();
                 $scope.newTask.title = '';
             }
@@ -658,14 +685,14 @@ myApp.controller("HomeController", ["$scope", "$http", "$document", "$timeout", 
                     if (confirm(confirmString)) {
 
                         $scope.newTask.title = '';
-                        $scope.commandHistory.push("DELETED DIRECTORY " + deleteString + ", TASKS DELETED: " + tasksToDelete.length)
+                        $scope.commandHistory.push(datestring + "$delete " + deleteString + " -> deleted " + tasksToDelete.length + " tasks")
                         tasksToDelete.forEach(function(task) {
                             deleteTask(task);
                         })
                     } else {
                         $scope.newTask.title = '';
 
-                        $scope.commandHistory.push("DELETE DIRECTORY CANCELED")
+                        $scope.commandHistory.push(datestring + "$delete " + deleteString + " -> canceled delete request")
                     }
                 } else {
                     //alert sayin there was no tasks
@@ -683,7 +710,9 @@ myApp.controller("HomeController", ["$scope", "$http", "$document", "$timeout", 
                 $scope.newTask.title = '';
                 var bug = findScrum(command)
 
-                $scope.commandHistory.push("ADDED BUG TO GLOBAL BUG DB: " + bug.title);
+                $scope.commandHistory.push(datestring + "$bug " + bug.title + " -> added bug to global bug db ");
+                var objDiv = document.getElementById("commandHistory");
+                objDiv.scrollTop = objDiv.scrollHeight;
                 var dbRef = firebase.database()
                     .ref()
                     .child('taskdb')
@@ -705,23 +734,65 @@ myApp.controller("HomeController", ["$scope", "$http", "$document", "$timeout", 
                 if (commandString.substring(7, 10) == "add") {
                     var friendToAdd = commandString.substring(11);
                     var isEmail = false;
-                    $scope.user.allUsers.forEach(m=>{
-                      if(m.email == friendToAdd && friendToAdd != $scope.user.email ){
-                        isEmail = true;
-                        $scope.commandHistory.push("FRIEND REQUEST SENT TO: " + m.email);
+                    var friend = {};
+                    $scope.user.allUsers.forEach(m => {
+                        if (m.email == friendToAdd && friendToAdd != $scope.user.email) {
+                            isEmail = true;
+                            friend = m;
+
+                        }
+                    });
+
+                    if (isEmail == true) {
+
                         var friendDB = firebase.database()
-                        .ref()
-                        .child('frienddb')
-                        .child(m.uid)
-                        .push({email: $scope.user.email, uid: $scope.user.uid, is_friend: false});
+                            .ref()
+                            .child('frienddb')
+                            .child(friend.uid)
 
-                      }
-                    })
+                        friendDB.once('value', snap => {
+                            var unqRequest = true;
+                            var tempArray = makeSnapshotObject(snap.val());
+                            console.log(tempArray);
 
-                    if(isEmail == false){
+                            tempArray.forEach(data => {
+                                if (data.email == $scope.user.email) {
+                                    unqRequest = false;
+                                }
+                            });
+
+                            if (unqRequest) {
+                                friendDB.push({
+                                    email: $scope.user.email,
+                                    uid: $scope.user.uid,
+                                    is_friend: false
+                                });
+
+                                $timeout(function() {
+                                    $scope.commandHistory.push(datestring + "$friend add " + friend.email + " -> sent friend request");
+                                    var objDiv = document.getElementById("commandHistory");
+                                    objDiv.scrollTop = objDiv.scrollHeight;
+                                })
+
+
+                            } else {
+                                $timeout(function() {
+                                    $scope.commandHistory.push(datestring + "ERROR: Friend request sent already, or you're already friends :)");
+                                    var objDiv = document.getElementById("commandHistory");
+                                    objDiv.scrollTop = objDiv.scrollHeight;
+                                })
+
+                            }
+                        }); //end of snapshot
+
+
+                    }
+
+
+                    if (isEmail == false) {
 
                         // alert('email not found in user database')
-                        $scope.commandHistory.push("ERROR: REQUEST NOT SENT, EMAIL NOT FOUND IN DB")
+                        $scope.commandHistory.push(datestring + "$friend add " + friendToAdd + " -> ERROR: REQUEST NOT SENT, EMAIL NOT FOUND IN DB")
 
                     }
 
@@ -730,14 +801,22 @@ myApp.controller("HomeController", ["$scope", "$http", "$document", "$timeout", 
                 }
             }
 
-            if(commandString == "cl"){
-              $scope.commandHistory = [];
-              $scope.newTask.title = '';
+            if (commandString == "cl") {
+                $scope.commandHistory = [datestring.substring(0, datestring.length - 2) + '/'];
+                $scope.newTask.title = '';
             }
 
-            if(commandString == "help"){
-              $scope.commandHistory.push("OPENING HELP MENU");
-              $scope.showHelp = true;
+            if (commandString == "help") {
+                if ($scope.showHelp) {
+                    $scope.commandHistory.push(datestring + ("$help -> closing help menu"));
+                    var objDiv = document.getElementById("commandHistory");
+                    objDiv.scrollTop = objDiv.scrollHeight;
+                } else {
+                    $scope.commandHistory.push(datestring + "$help -> opening help menu");
+                    var objDiv = document.getElementById("commandHistory");
+                    objDiv.scrollTop = objDiv.scrollHeight;
+                }
+                $scope.showHelp = !$scope.showHelp;
             }
             //NOTE: if refresh browser timers NEEDS to stay current. use Date.toString() and have a 'state' for each timer  in db;
             //NOTE: use new Date(task.date).getTime() to compare seconds between tasks ?
@@ -900,6 +979,7 @@ myApp.controller("HomeController", ["$scope", "$http", "$document", "$timeout", 
                 is_complete: task.is_complete
             });
     }
+
 
 
 
