@@ -6,7 +6,7 @@
 </div>
 
 <div ng-show="!task.is_complete && task.folder == currentFolder" ng-repeat="task in user.taskList track by $index">
-  <style ng-if="task.scrum == -1">{{'#task' + $index + '{opacity: 0.5 !important;}'}}</style>
+  <style ng-if="task.priority == -1">{{'#task' + $index + '{opacity: 0.5 !important;}'}}</style>
   <!-- <div class="folders">
     <span ng-repeat="folder in currentFolderStructure" ng-click="clickedfolder(folderName)" class="folderName"> {{folderName}} </span>
   </div> -->
@@ -29,7 +29,7 @@
             <span id="{{'task' + $index}}" ng-if="priorityInc" class ="scrumIncrementor" ng-click="priorityDown(task)">-</span>
             <span id="{{'task' + $index}}" ng-if="priorityInc" class ="scrumIncrementor" ng-click="priorityUp(task)">+</span>
             <span id="{{'task' + $index}}" ng-click="priorityInc = !priorityInc" class="scrumCount">{{'P:' + task.priority}}</span>
-            
+
 
             <span id="{{'task' + $index}}" class="taskTitle"> {{task.title}}  </span>
 
