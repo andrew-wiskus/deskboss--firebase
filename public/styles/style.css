@@ -251,6 +251,9 @@ input{
   z-index: 900;
 }
 
+.vers{
+  font-weight: lighter;
+}
 .commandLine_input{
 width: 100%;
 height: 40px;
