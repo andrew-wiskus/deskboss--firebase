@@ -5,7 +5,7 @@ myApp.controller("HomeController", ["$scope", "$http", "$document", "$timeout", 
 
 
     //KEY EVENT LISTENER !!! SO COOL :D
-    var commands = ['$dir', '$delete', '$bug', '$timer']
+    var commands = ['$dir', '$delete', '$bug', '$cl', '$friend', '$help', '$view']
     var commandCycle = 0;
     $document.bind("keydown", function(event) {
         //autocomplete functionality.. LIKE TERMINAL!@#! YAY
@@ -59,7 +59,7 @@ myApp.controller("HomeController", ["$scope", "$http", "$document", "$timeout", 
     // };
 
     //show/hide filter variables
-    $scope.commandHistory = ["welcome to deskboss.io :). \nalpha, v 0.13", "NOTE: Currently this app looks best in fullscreen:chrome, in fullscreen use CMD+SHIFT+F to hide toolbar", "type $help to see commands, $tutorial comming soon :) happy tasking", "@drew.wiskus", " ", "protip: use $cl to clear this window"];
+    $scope.commandHistory = ["welcome to deskboss.io :). \nalpha, v 0.15 type: $help for command list"];
     $scope.currentFolderStructure = ['main / ', 'new / ', 'works'];
     $scope.showTimer = false;
     $scope.showFolders = false;
@@ -71,6 +71,22 @@ myApp.controller("HomeController", ["$scope", "$http", "$document", "$timeout", 
     $scope.showPojo = false;
     $scope.newUser = true;
     $scope.newUserName = ''
+
+
+    $scope.welcomeScreen = true;
+    $scope.showTutorial = false;
+    //todo: move all this shit
+    $scope.currentLevel = 1;
+    $scope.nextLevel = function(){
+
+    }
+    $scope.prevLevel = function(){
+
+    }
+
+
+
+
         //info objects
     $scope.auth = AuthFactory;
     $scope.user;
@@ -267,6 +283,83 @@ myApp.controller("HomeController", ["$scope", "$http", "$document", "$timeout", 
                 .set(tempObj.scrum);
         }
     }
+
+    $scope.priorityUp = function(task) {
+
+
+        if (task.folder == null) { //this is a bug entry
+            var tempObj = task;
+            if(!(tempObj.priority >-2)){
+              tempObj.priority = 0
+            }
+            tempObj.priority = (tempObj.priority * 1) + 1;
+            console.log(tempObj);
+            var taskref = firebase.database()
+                .ref()
+                .child('taskdb')
+                .child('bugs')
+                .child(task.key)
+                .child('priority')
+                .set(tempObj.priority)
+
+        } else { //this is a task entry
+            var tempObj = task;
+            if(!(tempObj.priority >-2)){
+              tempObj.priority = 0
+            }
+            tempObj.priority = (tempObj.priority * 1) + 1;
+            console.log('attemping to increase priority:', tempObj);
+            var taskref = firebase.database()
+                .ref()
+                .child('taskdb')
+                .child($scope.user.uid)
+                .child(task.key)
+                .child('priority')
+                .set(tempObj.priority)
+
+        }
+
+    }
+    $scope.priorityDown = function(task) {
+        if (task.folder == null) { //this is a bug entry
+            var tempObj = task;
+            if(!(tempObj.priority >-2)){
+              tempObj.priority = 0
+            }
+            tempObj.priority = (tempObj.priority * 1) - 1;
+            if (tempObj.priority == -2) {
+                tempObj.priority = -1;
+            }
+            console.log(tempObj);
+            var taskref = firebase.database()
+                .ref()
+                .child('taskdb')
+                .child('bugs')
+                .child(task.key)
+                .child('priority')
+                .set(tempObj.priority);
+        } else { //this is a task entry
+            var tempObj = task;
+            if(!(tempObj.priority >-2)){
+              tempObj.priority = 0
+            }
+            tempObj.priority = (tempObj.priority * 1) - 1;
+            if (tempObj.priority == -2) {
+                tempObj.priority = -1;
+            }
+            console.log('attemping to increase priority:', tempObj);
+            var taskref = firebase.database()
+                .ref()
+                .child('taskdb')
+                .child($scope.user.uid)
+                .child(task.key)
+                .child('priority')
+                .set(tempObj.priority);
+        }
+    }
+
+
+
     $scope.addNewUser = function(newUser, user) {
         // console.log(user, newUser)
         var dbRef = firebase.database()
@@ -414,9 +507,13 @@ myApp.controller("HomeController", ["$scope", "$http", "$document", "$timeout", 
 
         var date = new Date()
         var datestring = date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds() + '   ' + $scope.currentFolder + ': ';
-
+        var taskStr = taskObject.title
 
         if (commandCheck(taskObject.title)) {
+            if(taskStr != '$cl'){
+
+            $scope.welcomeScreen = false;
+            }
             $scope.newTask.title = '';
             return;
         }
@@ -424,6 +521,7 @@ myApp.controller("HomeController", ["$scope", "$http", "$document", "$timeout", 
         var id = $scope.user.uid
         var scrumCount = findScrum(taskObject.title)
             .scrum
+
         var taskTitle = findScrum(taskObject.title)
             .title
 
@@ -800,7 +898,12 @@ myApp.controller("HomeController", ["$scope", "$http", "$document", "$timeout", 
 
                 }
             }
-
+            if (commandString == "start"){
+              $scope.showTutorial = true;
+              $scope.commandHistory.push(datestring + ("$start -> opening tutorial challenges"));
+              var objDiv = document.getElementById("commandHistory");
+              objDiv.scrollTop = objDiv.scrollHeight;
+            }
             if (commandString == "cl") {
                 $scope.commandHistory = [datestring.substring(0, datestring.length - 2) + '/'];
                 $scope.newTask.title = '';
@@ -907,6 +1010,7 @@ myApp.controller("HomeController", ["$scope", "$http", "$document", "$timeout", 
     //taskobject constructor for default values
     function TaskObject(title, scrum, folder) {
         this.title = title;
+        this.priority = 0;
         this.scrum = scrum;
         this.folder = folder;
         this.is_complete = false;
@@ -953,6 +1057,7 @@ myApp.controller("HomeController", ["$scope", "$http", "$document", "$timeout", 
         //update scope
         $timeout(function() {
             $scope.user = user;
+            $scope.user.level = 1;
             $scope.user.taskList = tempArray;
             $scope.user.folders = folderArray;
             findFoldersToShow();
@@ -964,7 +1069,6 @@ myApp.controller("HomeController", ["$scope", "$http", "$document", "$timeout", 
 
     //passes in list item after update and appends to db.
     function updateListItem(task) {
-
 
         var dbRef = firebase.database()
             .ref()

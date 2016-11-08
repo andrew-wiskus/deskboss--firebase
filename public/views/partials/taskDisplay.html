@@ -5,28 +5,36 @@
 </div>
 </div>
 
-<div ng-show="!task.is_complete && task.folder == currentFolder" ng-repeat="task in user.taskList">
+<div ng-show="!task.is_complete && task.folder == currentFolder" ng-repeat="task in user.taskList track by $index">
+  <style ng-if="task.scrum == -1">{{'#task' + $index + '{opacity: 0.5 !important;}'}}</style>
   <!-- <div class="folders">
     <span ng-repeat="folder in currentFolderStructure" ng-click="clickedfolder(folderName)" class="folderName"> {{folderName}} </span>
   </div> -->
 
   <div class="x">
-      <button class="taskButton taskButton1" ng-click="deleteTask(task)">DELETE</button>
+      <button class="taskButton taskButton1" ng-if="task.edit != true"ng-click="deleteTask(task)">DELETE</button>
       <button class="taskButton taskButton1" ng-if="task.edit != true" ng-click="task.edit = !task.edit">EDIT</button>
-      <button class="taskButton" ng-click="completeTask(task)">DONE!</button>
+      <button class="taskButton taskButton1" ng-if="task.edit != true" ng-click="completeTask(task)">DONE!</button>
+      <button ng-if="task.edit == true" class="taskButton" type="submit" ng-click="editTask(task)">SAVE</button>
+      <button ng-if="task.edit == true"class="taskButton" ng-click="task.edit = !task.edit">CANCEL</button>
 </div>
 
     <div class="taskListItem" ng-if="task.edit != true">
 
-            <span class ="scrumIncrementor" ng-click="scrumDown(task)">-</span>
-            <span class ="scrumIncrementor" ng-click="scrumUp(task)">+</span>
-            <span class="scrumCount">{{' #' + task.scrum}}</span>
-            <span class="taskTitle"> {{task.title}}  </span>
+            <span id="{{'task' + $index}}" ng-if="scrumInc" class ="scrumIncrementor" ng-click="scrumDown(task)">-</span>
+            <span id="{{'task' + $index}}" ng-if="scrumInc" class ="scrumIncrementor" ng-click="scrumUp(task)">+</span>
+            <span id="{{'task' + $index}}" ng-click="scrumInc = !scrumInc" class="scrumCount">{{'S:' + task.scrum}}</span>
+
+
+            <span id="{{'task' + $index}}" ng-if="priorityInc" class ="scrumIncrementor" ng-click="priorityDown(task)">-</span>
+            <span id="{{'task' + $index}}" ng-if="priorityInc" class ="scrumIncrementor" ng-click="priorityUp(task)">+</span>
+            <span id="{{'task' + $index}}" ng-click="priorityInc = !priorityInc" class="scrumCount">{{'P:' + task.priority}}</span>
+            
+
+            <span id="{{'task' + $index}}" class="taskTitle"> {{task.title}}  </span>
 
     </div>
-    <form ng-if="task.edit == true">
-        <input type="text" ng-model="task.title" value="task.title"></input>
-        <button type="submit" ng-click="editTask(task)">SAVE</button> <button ng-click="task.edit = !task.edit">CANCEL</button>
-    </form>
+    <input type="text" ng-if="task.edit == true" class="taskListItem taskInputEdit" ng-model="task.title" value="task.title"></input>
+
 
 </div>

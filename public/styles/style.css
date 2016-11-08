@@ -6,6 +6,16 @@ input{
   margin: 0;
 }
 
+.taskInputEdit{
+  background-color: #371423;
+  width: 100%;
+  margin-bottom: 10px !important;
+  margin-top: 10px !important;
+
+}
+.formEdit{
+  display: inline-block;
+}
 *{
   -moz-box-sizing:    border-box;
   -webkit-box-sizing: border-box;
@@ -14,6 +24,27 @@ input{
    font-family: helvetica;
 }
 
+.scrumIncrementor{
+  cursor: pointer;
+  font-size: 22px;
+  font-weight: bolder;
+}
+.scrumIncrementor:hover{
+  background-color: #FCFFEB;
+  opacity: 0.5;
+  color: #371423;
+}
+.scrumCount{
+  font-size: 22px;
+  font-weight: bolder;
+  opacity: 0.8;
+  cursor: pointer;
+}
+.scrumCount:hover{
+  background-color: #FCFFEB;
+  opacity: 0.5;
+  color: #371423;
+}
 .background{
   width: 100%;
   height: 100%;
@@ -106,7 +137,23 @@ input{
   font-size: 22px;
 }
 
+.welcomeText{
+  font-size: 35px;
+  font-weight: lighter;
+}
+.tutorialContainer{
+  width: 100%;
+  height: 100%;
+
+  /*background-color: red;*/
+}
+.ifYoureNew{
+  font-size: 35px;
+  font-weight: lighter;
+}
 .viewDisplay{
+  padding-left:10px;
+
   overflow-y: scroll;
   padding-top: 50px;
   width: 38.2%;
@@ -136,6 +183,7 @@ input{
   background-color: #FCFFEB;
   opacity: 0.5;
   color: #371423;
+  cursor: pointer;
 }
 
 .wip{
@@ -161,10 +209,10 @@ input{
 /* ------------------ TASK LIST ------------------ */
 
 .taskListItem  {
-  font-size: 20px;
+  font-size: 22px;
   font-weight: lighter;
-  margin-top:3px;
-  margin-bottom: 3px;
+  margin-top:6px;
+  margin-bottom: 6px;
 }
 
 .taskListTitle{
