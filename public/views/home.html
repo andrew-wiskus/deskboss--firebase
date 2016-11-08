@@ -42,6 +42,7 @@
   </div>
   <div ng-if="showHelp" class="helpText">
     <h4> BLING FUNCTIONS (click to see details)</h4>
+    <p><span ng-click="showCommand0 = !showCommand0"class="helpTextCommand">$start <br/></span>                                                                                        <span class="commandInfo" ng-if="showCommand0"> -shows level progression/walkthrough of all features</p>
     <p><span ng-click="showCommand1 = !showCommand1"class="helpTextCommand">$help <br/></span>                                                                                        <span class="commandInfo" ng-if="showCommand1"> -show help</p>
     <p><span ng-click="showCommand2 = !showCommand2"class="helpTextCommand">$bug foobar #1<br/></span>                                                                               <span class="commandInfo" ng-if="showCommand2"> -sends a bug ticket "foobar" to bug database. priority added with #, 1: low interference -- 9: app breaking interference </p>
     <p><span ng-click="showCommand3 = !showCommand3"class="helpTextCommand">$delete main/foo/bar <br/></span>                                                                         <span class="commandInfo" ng-if="showCommand3">-deletes folder 'main/foo/bar' and all children task/folders. will prompt confirmation window</p>

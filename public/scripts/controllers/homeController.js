@@ -320,6 +320,9 @@ myApp.controller("HomeController", ["$scope", "$http", "$document", "$timeout", 
         }
 
     }
+
+
+
     $scope.priorityDown = function(task) {
         if (task.folder == null) { //this is a bug entry
             var tempObj = task;
@@ -900,6 +903,7 @@ myApp.controller("HomeController", ["$scope", "$http", "$document", "$timeout", 
             }
             if (commandString == "start"){
               $scope.showTutorial = true;
+              $scope.showHelp = false;
               $scope.commandHistory.push(datestring + ("$start -> opening tutorial challenges"));
               var objDiv = document.getElementById("commandHistory");
               objDiv.scrollTop = objDiv.scrollHeight;
@@ -920,6 +924,10 @@ myApp.controller("HomeController", ["$scope", "$http", "$document", "$timeout", 
                     objDiv.scrollTop = objDiv.scrollHeight;
                 }
                 $scope.showHelp = !$scope.showHelp;
+                $scope.showTutorial = false;
+
+
+
             }
             //NOTE: if refresh browser timers NEEDS to stay current. use Date.toString() and have a 'state' for each timer  in db;
             //NOTE: use new Date(task.date).getTime() to compare seconds between tasks ?
