@@ -20,10 +20,51 @@
     <h3><span class="welcomeText">welcome</span><br/> to deskboss.io :)</h3>
 
     <p>deskboss.io is both an educational tool as well as a personal life-manager that lives in your browser</p>
-    <h3 class="wip vers">alpha version: 0.15 // last updated Nov 8, 2016</h3>
+    <h3 class="wip vers">alpha version: 0.16 // last updated Nov 11, 2016</h3>
     <br/><br/><br/><br/><br/><br/>
     <p><span class="ifYoureNew">if you're new</span><br/> deskboss.io has many cool features accessed via the 'commandline'. <br/>1. Locate the input field with 'add task' </br>2. <em>type: $start</em></p>
 
+
+  </div>
+
+  <div ng-if="showFriends" class="friendsScreen">
+    hello friend screen;
+    <h4 ng-if="user.friendRequests.length > 0">REQUESTS</h4>
+    <div ng-if="user.friendRequests.length > 0" ng-repeat="request in user.friendRequests">
+        {{request.email}} <button ng-click="addFriend(request)">add friend</button><button ng-click="denyFriend(request)">deny</button>
+    </div>
+    <h4 ng-if="user.friends.length > 0">FRIENDS</h4>
+    <div ng-if="user.friends.length > 0" ng-repeat="friend in user.friends">
+        {{friend.email}}
+    </div>
+  </div>
+
+  <div ng-if="showDevBlog">
+    <h3>Nov 11, 2016.</h3>
+    <ol>
+      <li>added clickable priority and scrum incrementors</li>
+      <li>added brief level-style tutorial</li>
+      <li>added $view devBlog</li>
+      <li>added $view friends</li>
+      <li>added $orderBy scrum</li>
+      <li>added $orderBy date</li>
+      <li> added $orderBy priority</li>
+    </ol>
+    <h4>next update feature goals:</h4>
+    <ol>
+      <li>searchable friends, @username/email/fullName</li>
+      <li>shared task lists between friends</li>
+      <li>message board attached to shared task lists</li>
+      <li>private messaging</li>
+      <li>update to friend view ui</li>
+      <li>priority in-line command simillar to scrum #5: *5?</li>
+    </ol>
+    <h4>things2fix:</h4>
+    <ol>
+      <li>have $orderBy be saved in userdb, any changes to db will override order</li>
+      <li>when friend sends request/accepts request, update both friendsDB</li>
+      <li>when user has no tasks(ie: first time) force tutorial session</li>
+    </ol>
 
   </div>
 
@@ -47,7 +88,9 @@
   <div ng-if="showHelp" class="helpText">
     <h4> BLING FUNCTIONS (click to see details)</h4>
     <p><span ng-click="showCommand0 = !showCommand0"class="helpTextCommand">$start <br/></span>                                                                                        <span class="commandInfo" ng-if="showCommand0"> -shows level progression/walkthrough of all features</p>
-    <p><span ng-click="showCommand1 = !showCommand1"class="helpTextCommand">$help <br/></span>                                                                                        <span class="commandInfo" ng-if="showCommand1"> -show help</p>
+      <p><span ng-click="showCommand1 = !showCommand1"class="helpTextCommand">$help <br/></span>                                                                                        <span class="commandInfo" ng-if="showCommand1"> -show help</p>
+        <p><span ng-click="showCommandvdb = !showCommandvdb"class="helpTextCommand">$view devBlog <br/></span>                                                                                        <span class="commandInfo" ng-if="showCommandvdb"> -collection of update notes</p>
+          <p><span ng-click="showCommandvf = !showCommandvf"class="helpTextCommand">$view friends <br/></span>                                                                                        <span class="commandInfo" ng-if="showCommandvf"> -view friends portal(currently bugged :P)</p>
     <p><span ng-click="showCommand2 = !showCommand2"class="helpTextCommand">$bug foobar #1<br/></span>                                                                               <span class="commandInfo" ng-if="showCommand2"> -sends a bug ticket "foobar" to bug database. priority added with #, 1: low interference -- 9: app breaking interference </p>
     <p><span ng-click="showCommand3 = !showCommand3"class="helpTextCommand">$delete main/foo/bar <br/></span>                                                                         <span class="commandInfo" ng-if="showCommand3">-deletes folder 'main/foo/bar' and all children task/folders. will prompt confirmation window</p>
     <p><span ng-click="showCommand4 = !showCommand4"class="helpTextCommand">$dir foo <br/></span>                                                                                     <span class="commandInfo" ng-if="showCommand4">-changes to directory 'currentfolder/foo'. NOTE: will create a new folder if folder does not exist. PRO-TIP: If you create a folder within a folder that doesnt hold a task you create a 'secret folder'. This 'secret folder' can only be accessed by $dir into its parent folder, the parent folder will not show up in any gui so you can think of it as a secret key/refrence. $dir secretFolderKey -> $dir innerSecretFolder == /main/secretFolderKey/innerSecretFolder. this will not show up on the ui :) neato eh? </p>

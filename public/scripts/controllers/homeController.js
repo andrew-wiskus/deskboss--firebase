@@ -71,8 +71,8 @@ myApp.controller("HomeController", ["$scope", "$http", "$document", "$timeout", 
     $scope.showPojo = false;
     $scope.newUser = true;
     $scope.newUserName = ''
-
-
+    $scope.showFriends = false;
+$scope.showDevBlog = false;
     $scope.welcomeScreen = true;
     $scope.showTutorial = false;
     //todo: move all this shit
@@ -513,10 +513,6 @@ myApp.controller("HomeController", ["$scope", "$http", "$document", "$timeout", 
         var taskStr = taskObject.title
 
         if (commandCheck(taskObject.title)) {
-            if(taskStr != '$cl'){
-
-            $scope.welcomeScreen = false;
-            }
             $scope.newTask.title = '';
             return;
         }
@@ -829,7 +825,15 @@ myApp.controller("HomeController", ["$scope", "$http", "$document", "$timeout", 
             //x: note, alert, calander
             //y: data
             //z: taskprefix to attach info to
+            if (commandString == "view friends"){
+              hideAll()
+              $scope.showFriends = true;
+            }
 
+            if(commandString == "view devBlog"){
+              hideAll()
+              $scope.showDevBlog = true;
+            }
             if (commandString.substring(0, 7) == "friend ") {
                 //TODO:if friend doesnt exist in db -> check requested friends db so no multiples -> then execute code below
                 if (commandString.substring(7, 10) == "add") {
@@ -902,8 +906,9 @@ myApp.controller("HomeController", ["$scope", "$http", "$document", "$timeout", 
                 }
             }
             if (commandString == "start"){
+              hideAll();
               $scope.showTutorial = true;
-              $scope.showHelp = false;
+
               $scope.commandHistory.push(datestring + ("$start -> opening tutorial challenges"));
               var objDiv = document.getElementById("commandHistory");
               objDiv.scrollTop = objDiv.scrollHeight;
@@ -914,17 +919,9 @@ myApp.controller("HomeController", ["$scope", "$http", "$document", "$timeout", 
             }
 
             if (commandString == "help") {
-                if ($scope.showHelp) {
-                    $scope.commandHistory.push(datestring + ("$help -> closing help menu"));
-                    var objDiv = document.getElementById("commandHistory");
-                    objDiv.scrollTop = objDiv.scrollHeight;
-                } else {
-                    $scope.commandHistory.push(datestring + "$help -> opening help menu");
-                    var objDiv = document.getElementById("commandHistory");
-                    objDiv.scrollTop = objDiv.scrollHeight;
-                }
+                hideAll()
                 $scope.showHelp = !$scope.showHelp;
-                $scope.showTutorial = false;
+
 
 
 
@@ -933,9 +930,9 @@ myApp.controller("HomeController", ["$scope", "$http", "$document", "$timeout", 
             //NOTE: use new Date(task.date).getTime() to compare seconds between tasks ?
             //NOTE: timer goes after set time, ui effect/alert after timer runs out.
             if (commandString.substring(0, 6) == "sprint") {
-                $scope.showTimer = !$scope.showTimer;
+
             }
-            if (commandString.substring(0, 6) == "sprint ") {
+            if (commandString.substring(0, 7) == "sprint ") {
 
                 var sprintCommands = [{
                     command: 'add',
@@ -988,6 +985,25 @@ myApp.controller("HomeController", ["$scope", "$http", "$document", "$timeout", 
 
 
 
+            if (commandString.substring(0, 12) == "orderBy date"){
+              // console.log(orderBy('date'));
+              $scope.user.taskList = orderBy('date');
+            }
+
+            if (commandString == "orderBy a"){
+              $scope.user.taskList = orderBy('title');
+
+            }
+            if (commandString.substring(0, 13) == "orderBy s"){
+              $scope.user.taskList = orderBy('scrum');
+
+            }
+            if (commandString.substring(0, 16) == "orderBy p"){
+              $scope.user.taskList = orderBy('priority');
+
+            }
+
+
 
 
 
@@ -996,6 +1012,54 @@ myApp.controller("HomeController", ["$scope", "$http", "$document", "$timeout", 
         }
 
     }
+
+
+    function orderBy(param){
+      $scope.commandHistory.push('SORRY: ORDERBY CURRENTLY BUGGED. forgive me :) but it had some weird false-cases and I want it perfect so its disabled at the moment')
+      return $scope.user.taskList;
+
+
+      // TODO: bugged ;/
+      // var thisArray = $scope.user.taskList
+      // var tempArray = _.sortBy( $scope.user.taskList, param );
+      // var reverseArray = tempArray.reverse();
+      // var reverseOrder = true;
+      // thisArray.map((x,i)=>{
+      //   if(x.date == undefined){
+      //     console.warn('BUG BUG BUG: undefined date in task list')
+      //   }
+      //   if(x.title == tempArray[i].title){
+      //
+      //
+      //   } else{
+      //     reverseOrder = false;
+      //   }
+
+
+
+
+      //does the current order match the order by date? -> reverse order
+      // if(reverseOrder){
+      //   console.log('is ordered: reversing');
+      //   return tempArray;
+      // } else{
+      //   console.log('isnt ordered');
+      //   return reverseArray;
+      // }
+
+    }
+
+    function dynamicSort(property) {
+    var sortOrder = 1;
+    if(property[0] === "-") {
+        sortOrder = -1;
+        property = property.substr(1);
+    }
+    return function (a,b) {
+        var result = (a[property] < b[property]) ? -1 : (a[property] > b[property]) ? 1 : 0;
+        return result * sortOrder;
+    }
+}
 
     //finds number associated with scrum #23, throws error if alpha characters past #
     function findScrum(str) {
@@ -1088,11 +1152,18 @@ myApp.controller("HomeController", ["$scope", "$http", "$document", "$timeout", 
                 title: task.title,
                 scrum: task.scrum,
                 folder: task.folder,
-                is_complete: task.is_complete
+                is_complete: task.is_complete,
+                priority: task.priority
             });
     }
 
 
+    function hideAll(){
+        $scope.welcomeScreen = false;
+        $scope.showTutorial = false;
+        $scope.showHelp = false;
+        $scope.showFriends = false;
+    }
 
 
 }]);
